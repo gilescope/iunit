@@ -4,7 +4,6 @@ mod stdx {
         use ::std::collections::HashSet;
         use ::std::hash::Hash;
 
-
         pub trait Set<T> where T: Eq + Hash
         {
             fn new() -> Self;
@@ -17,7 +16,9 @@ mod stdx {
 
             fn is_superset(&self, other: &Self) -> bool;
 
-           // fn intersection<'a>(&'a self, other: &'a Self) -> &'a Iterator<Item=&T>;
+            fn intersection<'a>(&'a self, other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a>;
+
+            fn contains(&self, item: &T) -> bool;
         }
 
         impl<T> Set<T> for HashSet<T> where T: Eq + Hash
@@ -32,8 +33,12 @@ mod stdx {
 
             fn is_superset(&self, other: &Self) -> bool { self.is_superset(other) }
 
-//            fn intersection<'a>(&'a self, other: &'a Self) -> &'a Iterator<Item=&T>
-//            { (&self.intersection(other) as &::std::iter::Iterator<Item=&T>) }
+            fn intersection<'a>(&'a self, other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a>
+            {
+                Box::new(self.intersection(other))
+            }
+
+            fn contains(&self, item: &T) -> bool { self.contains(item) }
         }
 
         impl<T> Set<T> for BTreeSet<T> where T: Eq + Hash + Ord
@@ -47,11 +52,13 @@ mod stdx {
             fn is_subset(&self, other: &Self) -> bool { self.is_subset(other) }
 
             fn is_superset(&self, other: &Self) -> bool { self.is_superset(other) }
-//
-//            fn intersection<'a>(&'a self, other: &'a Self) -> &'a Iterator<Item=&T>
-//            {
-//                &self.intersection(other)
-//            }
+
+            fn intersection<'b>(&'b self, other: &'b Self) -> Box<Iterator<Item=&'b T> + 'b>
+            {
+                Box::new(self.intersection(other))
+            }
+
+            fn contains(&self, item: &T) -> bool { self.contains(item) }
         }
 
         #[cfg(test)]
@@ -70,12 +77,15 @@ mod stdx {
             }
 
             fn test_set_trait<S>()
-                where S: super::Set<isize> + IntoIterator<Item=isize>
+                where S: super::Set<isize>
+                + IntoIterator<Item=isize>
+                + ::std::iter::FromIterator<isize>
             {
                 test_disjoint_iunit::<S>();
                 test_subset_and_superset_iunit::<S>();
                 test_iterate::<S>();
-                //test_intersection::<S>();
+                test_intersection::<S>();
+                test_from_iter::<S>();
             }
 
             fn test_disjoint_iunit<S>()
@@ -146,37 +156,63 @@ mod stdx {
                 assert_eq!(observed, 0xFFFF_FFFF);
             }
 
-//            fn test_intersection<S>()
-//                where S: super::Set<isize>
-//                + IntoIterator<Item=isize>
-//            {
-//                let mut a = S::new();
-//                let mut b = S::new();
+            fn test_from_iter<S>()
+                where S: ::std::iter::FromIterator<isize> + super::Set<isize>
+            {
+                let xs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+                let set: S = xs.iter().cloned().collect();
+
+                for x in &xs {
+                    assert!(set.contains(x));
+                }
+            }
+
+//            fn test_move_iter<S>() {
+//                let hs = {
+//                    let mut hs = HashSet::new();
 //
-//                assert!(a.insert(11));
-//                assert!(a.insert(1));
-//                assert!(a.insert(3));
-//                assert!(a.insert(77));
-//                assert!(a.insert(103));
-//                assert!(a.insert(5));
-//                assert!(a.insert(-5));
+//                    hs.insert('a');
+//                    hs.insert('b');
 //
-//                assert!(b.insert(2));
-//                assert!(b.insert(11));
-//                assert!(b.insert(77));
-//                assert!(b.insert(-9));
-//                assert!(b.insert(-42));
-//                assert!(b.insert(5));
-//                assert!(b.insert(3));
+//                    hs
+//                };
 //
-//                let mut i = 0;
-//                let expected = [3, 5, 11, 77];
-//                for x in *a.intersection(&b) {
-//                    assert!(expected.contains(&x));
-//                    i += 1
-//                }
-//                assert_eq!(i, expected.len());
+//                let v = hs.into_iter().collect::<Vec<char>>();
+//                assert!(v == ['a', 'b'] || v == ['b', 'a']);
 //            }
+
+            fn test_intersection<S>()
+                where S: super::Set<isize>
+                + IntoIterator<Item=isize>
+            {
+                let mut a = S::new();
+                let mut b = S::new();
+
+                assert!(a.insert(11));
+                assert!(a.insert(1));
+                assert!(a.insert(3));
+                assert!(a.insert(77));
+                assert!(a.insert(103));
+                assert!(a.insert(5));
+                assert!(a.insert(-5));
+
+                assert!(b.insert(2));
+                assert!(b.insert(11));
+                assert!(b.insert(77));
+                assert!(b.insert(-9));
+                assert!(b.insert(-42));
+                assert!(b.insert(5));
+                assert!(b.insert(3));
+
+                let mut i = 0;
+                let expected = [3, 5, 11, 77];
+                for x in a.intersection(&b) {
+                    assert!(expected.contains(&x));
+                    i += 1
+                }
+                assert_eq!(i, expected.len());
+            }
         }
     }
 }
