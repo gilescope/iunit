@@ -1,4 +1,11 @@
 //Oct12th.Eng
+#![feature(custom_attribute)]
+
+use syntax::parse::token;
+use syntax::tokenstream::TokenTree;
+use syntax::ext::base::ExtCtxt;
+use rustc_plugin::Registry;
+
 mod stdx {
     mod collections {
         use ::std::collections::btree_set::BTreeSet;
@@ -147,16 +154,16 @@ mod stdx {
 
             #[test]
             fn test_set_hash() {
-                test_set_trait::<HashSet<isize>>();
-                test_move_iter::<HashSet<char>>();
-                test_replace::<HashSet<Foo>>();
+                test_set_trait::<HashSet<_>>();
+                test_move_iter::<HashSet<_>>();
+                test_replace::<HashSet<_>>();
             }
 
             #[test]
             fn test_set_btree() {
-                test_set_trait::<BTreeSet<isize>>();
-                test_move_iter::<BTreeSet<char>>();
-                test_replace::<BTreeSet<Foo>>();
+                test_set_trait::<BTreeSet<_>>();
+                test_move_iter::<BTreeSet<_>>();
+                test_replace::<BTreeSet<_>>();
             }
 
             fn test_set_trait<S>()
@@ -181,6 +188,20 @@ mod stdx {
 
             }
 
+            macro_rules! test_traits {
+                // `()` indicates that the macro takes no argument.
+                () => (
+                    // The macro will expand into the contents of this block.
+                    #[test]
+                    fn test_tra() {
+                        println!("Hi");
+                    }
+                )
+            }
+
+            // The following are Rust's HashSet tests with minimal modifications.
+
+            #[test_traits]
             fn test_disjoint<S>()
                 where S: super::Set<isize>
             {
