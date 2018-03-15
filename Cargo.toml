@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Giles Cope <gilescope@gmail.com>"]
 
 [dependencies]
-test_trait_derive = { version="*", path="procmacro/test-trait-derive"}
+test_trait_derive = { path="procmacro/test_trait_derive"}

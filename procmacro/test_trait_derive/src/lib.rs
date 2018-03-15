@@ -5,7 +5,7 @@ extern crate quote;
 
 use proc_macro::TokenStream;
 
-#[proc_macro_derive(HelloWorld)]
+#[proc_macro_derive(HelloWorld, attributes(HelloWorldName))]
 pub fn hello_world(input: TokenStream) -> TokenStream {
     // Construct a string representation of the type definition
     let s = input.to_string();
@@ -19,8 +19,6 @@ pub fn hello_world(input: TokenStream) -> TokenStream {
     // Return the generated impl
     gen.parse().unwrap()
 }
-
-
 
 fn impl_hello_world(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
