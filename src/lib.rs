@@ -29,7 +29,7 @@ mod stdx {
         use ::std::hash as hash;
 
         #[derive(Debug)]
-        struct Foo(&'static str, i32);
+        pub struct Foo(&'static str, i32);
 
         impl PartialEq for Foo {
             fn eq(&self, other: &Self) -> bool {
@@ -57,17 +57,6 @@ mod stdx {
             }
         }
 
-//        pub struct SetConventions{}
-//
-//        impl SetConventions {
-//            fn test(x: &Set<T>) {
-//                HashSet::<isize>::tests_isize::<BTreeSet<_>>();
-//                HashSet::<char>::tests_char::<BTreeSet<_>>();
-//                HashSet::<Foo>::tests_char::<BTreeSet<_>>();
-//            }
-//        }
-
-        //TODO link to conventions
         pub trait Set<T> where T: Eq + Hash
         {
             fn new() -> Self;
@@ -103,46 +92,16 @@ mod stdx {
         }
 
         #[cfg(test)]
-        pub trait SetTests<T> : Set<T> where T: Eq + Hash
+        pub trait SetTestsisize : Set<isize> + Sized
+            + IntoIterator<Item=isize>
+            + Debug + Eq
+            + FromIterator<isize>
         {
-            //TODO: start autogen this?
-            #[cfg(test)]
-            fn tests_isize<S>()
-                where S: Set<isize>
-                + IntoIterator<Item=isize>
-                + FromIterator<isize>
-                + Eq + Debug
+            #[test]
+            fn test_disjoint()
             {
-                Self::test_disjoint::<S>();
-                Self::test_subset_and_superset::<S>();
-                Self::test_iterate::<S>();
-                Self::test_intersection::<S>();
-
-                Self::test_from_iter::<S>();
-                Self::test_symmetric_difference::<S>();
-                Self::test_difference::<S>();
-                Self::test_union::<S>();
-
-                Self::test_eq::<S>();
-                Self::test_show::<S>();
-            }
-            fn tests_char<S>()
-                where S: Set<char>
-                + IntoIterator<Item=char>
-                + FromIterator<char>
-                + Eq + Debug
-            {
-                Self::test_move_iter::<S>();
-            }
-            //TODO end autogen
-
-            #[cfg(test)]
-            fn test_disjoint<S>()
-                where S: Set<isize>
-            {
-                //FrenchToast::hello_world();
-                let mut xs = S::new();
-                let mut ys = S::new();
+                let mut xs = Self::new();
+                let mut ys = Self::new();
                 assert!(xs.is_disjoint(&ys));
                 assert!(ys.is_disjoint(&xs));
                 assert!(xs.insert(5));
@@ -161,17 +120,16 @@ mod stdx {
                 assert!(!ys.is_disjoint(&xs));
             }
 
-            #[cfg(test)]
-            fn test_subset_and_superset<S>()
-                where S: Set<isize>
+            #[test]
+            fn test_subset_and_superset()
             {
-                let mut a = S::new();
+                let mut a = Self::new();
                 assert!(a.insert(0));
                 assert!(a.insert(5));
                 assert!(a.insert(11));
                 assert!(a.insert(7));
 
-                let mut b = S::new();
+                let mut b = Self::new();
                 assert!(b.insert(0));
                 assert!(b.insert(7));
                 assert!(b.insert(19));
@@ -192,28 +150,10 @@ mod stdx {
                 assert!(b.is_superset(&a));
             }
 
-            #[cfg(test)]
-            fn test_move_iter<S>()
-                where S: Set<char> + IntoIterator<Item=char>
+            #[test]
+            fn test_iterate()
             {
-                let hs = {
-                    let mut hs = S::new();
-
-                    hs.insert('a');
-                    hs.insert('b');
-
-                    hs
-                };
-
-                let v = hs.into_iter().collect::<Vec<char>>();
-                assert!(v == ['a', 'b'] || v == ['b', 'a']);
-            }
-
-            #[cfg(test)]
-            fn test_iterate<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
-            {
-                let mut a = S::new();
+                let mut a = Self::new();
                 for i in 0..32 {
                     assert!(a.insert(i));
                 }
@@ -224,12 +164,11 @@ mod stdx {
                 assert_eq!(observed, 0xFFFF_FFFF);
             }
 
-            #[cfg(test)]
-            fn test_intersection<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
+            #[test]
+            fn test_intersection()
             {
-                let mut a = S::new();
-                let mut b = S::new();
+                let mut a = Self::new();
+                let mut b = Self::new();
 
                 assert!(a.insert(11));
                 assert!(a.insert(1));
@@ -256,12 +195,11 @@ mod stdx {
                 assert_eq!(i, expected.len());
             }
 
-            #[cfg(test)]
-            fn test_difference<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
+            #[test]
+            fn test_difference()
             {
-                let mut a = S::new();
-                let mut b = S::new();
+                let mut a = Self::new();
+                let mut b = Self::new();
 
                 assert!(a.insert(1));
                 assert!(a.insert(3));
@@ -281,12 +219,11 @@ mod stdx {
                 assert_eq!(i, expected.len());
             }
 
-            #[cfg(test)]
-            fn test_symmetric_difference<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
+            #[test]
+            fn test_symmetric_difference()
             {
-                let mut a = S::new();
-                let mut b = S::new();
+                let mut a = Self::new();
+                let mut b = Self::new();
 
                 assert!(a.insert(1));
                 assert!(a.insert(3));
@@ -309,12 +246,11 @@ mod stdx {
                 assert_eq!(i, expected.len());
             }
 
-            #[cfg(test)]
-            fn test_union<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
+            #[test]
+            fn test_union()
             {
-                let mut a = S::new();
-                let mut b = S::new();
+                let mut a = Self::new();
+                let mut b = Self::new();
 
                 assert!(a.insert(1));
                 assert!(a.insert(3));
@@ -341,32 +277,30 @@ mod stdx {
                 assert_eq!(i, expected.len());
             }
 
-            #[cfg(test)]
-            fn test_from_iter<S>()
-                where S: Set<isize> + FromIterator<isize>
+            #[test]
+            fn test_from_iter()
             {
                 let xs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-                let set: S = xs.iter().cloned().collect();
+                let set: Self = xs.iter().cloned().collect();
 
                 for x in &xs {
                     assert!(set.contains(x));
                 }
             }
 
-            #[cfg(test)]
-            fn test_eq<S>()
-                where S: Set<isize> + Eq + Debug
+            #[test]
+            fn test_eq()
             {
                 // These constants once happened to expose a bug in insert().
                 // I'm keeping them around to prevent a regression.
-                let mut s1 = S::new();
+                let mut s1 = Self::new();
 
                 s1.insert(1);
                 s1.insert(2);
                 s1.insert(3);
 
-                let mut s2 = S::new();
+                let mut s2 = Self::new();
 
                 s2.insert(1);
                 s2.insert(2);
@@ -378,12 +312,11 @@ mod stdx {
                 assert_eq!(s1, s2);
             }
 
-            #[cfg(test)]
-            fn test_show<S>()
-                where S: Set<isize> + Eq + Debug
+            #[test]
+            fn test_show()
             {
-                let mut set = S::new();
-                let empty = S::new();
+                let mut set = Self::new();
+                let empty = Self::new();
 
                 set.insert(1);
                 set.insert(2);
@@ -394,11 +327,10 @@ mod stdx {
                 assert_eq!(format!("{:?}", empty), "{}");
             }
 
-            #[cfg(test)]
-            fn test_extend_ref<S>()
-                where S: Set<isize> + IntoIterator<Item=isize>
+            #[test]
+            fn test_extend_ref()
             {
-                let mut a = S::new();
+                let mut a = Self::new();
                 a.insert(1);
 
                 a.extend(vec![2isize, 3, 4]); //TODO should be &[2,3,4]
@@ -409,7 +341,7 @@ mod stdx {
                 assert!(a.contains(&3));
                 assert!(a.contains(&4));
 
-                let mut b = S::new();
+                let mut b = Self::new();
                 b.insert(5);
                 b.insert(6);
 
@@ -423,11 +355,15 @@ mod stdx {
                 assert!(a.contains(&5));
                 assert!(a.contains(&6));
             }
+        }
 
-            fn test_replace<S>()
-                where S: Set<Foo>
-                + IntoIterator<Item=Foo> {
-                let mut s = S::new();
+        #[cfg(test)]
+        pub trait SetTestsfoo : Set<Foo> + Sized + IntoIterator<Item=Foo>
+        {
+            #[test]
+            fn test_replace()
+            {
+                let mut s = Self::new();
                 assert_eq!(s.replace(Foo("a", 1)), None);
                 assert_eq!(s.len(), 1);
                 assert_eq!(s.replace(Foo("a", 2)), Some(Foo("a", 1)));
@@ -439,18 +375,35 @@ mod stdx {
             }
         }
 
-        impl <T> SetTests<T> for HashSet<T> where T: Eq + Hash {}
-        impl <T> SetTests<T> for BTreeSet<T> where T: Eq + Hash + Ord {}
-
-        //TODO auto-generate start
         #[cfg(test)]
-        #[test]
-        fn test_hashset_trait_set() {
-            HashSet::<isize>::tests_isize::<BTreeSet<_>>();
-            HashSet::<char>::tests_char::<BTreeSet<_>>();
-            HashSet::<Foo>::tests_char::<BTreeSet<_>>();
+        pub trait SetTestschar : Set<char> + Sized + IntoIterator<Item=char>
+        {
+            #[test]
+            fn test_move_iter()
+            {
+                let hs = {
+                    let mut hs = Self::new();
+
+                    hs.insert('a');
+                    hs.insert('b');
+
+                    hs
+                };
+
+                let v = hs.into_iter().collect::<Vec<char>>();
+                assert!(v == ['a', 'b'] || v == ['b', 'a']);
+            }
         }
-        //TODO auto-generate end
+
+
+
+
+        #[cfg(test)]
+        impl SetTestsisize for HashSet<isize>{}
+
+        #[cfg(test)]
+        impl SetTestschar for HashSet<char>{}
+
         #[trait_tests]
         #[test_types="isize,char,Foo"]
         impl<T> Set<T> for HashSet<T> where T: Eq + Hash
@@ -503,19 +456,27 @@ mod stdx {
             }
         }
 
-
-        //TODO auto-generate start
+//        //TODO auto-generate start
         #[cfg(test)]
-        #[test]
-        fn test_btreeset_trait_set() {
-            BTreeSet::<isize>::tests_isize::<BTreeSet<_>>();
-            BTreeSet::<char>::tests_char::<BTreeSet<_>>();
-            HashSet::<Foo>::tests_char::<BTreeSet<_>>();
-        }
-        //TODO auto-generate end
+        #[promote_tests]
+        impl SetTestsisize for BTreeSet<isize>{}
 
-        #[trait_tests]
-        #[test_types="isize,char,Foo"]
+        #[test] fn BTreeSet_test_difference() { BTreeSet::<isize>::test_difference(); }
+        #[test] fn BTreeSet_test_union() { BTreeSet::<isize>::test_union(); }
+        #[test] fn BTreeSet_test_symmetric_difference() { BTreeSet::<isize>::test_symmetric_difference(); }
+
+        #[cfg(test)]
+        #[promote_tests]
+        impl SetTestschar for BTreeSet<char>{}
+        #[test] fn BTreeSet_test_move_iter() { BTreeSet::<char>::test_move_iter(); }
+
+        #[cfg(test)]
+        #[promote_tests]
+        impl SetTestsfoo for BTreeSet<Foo>{}
+
+        #[test] fn BTreeSet_test_replace() { BTreeSet::<Foo>::test_replace(); }
+//        //TODO auto-generate end
+
         impl<T> Set<T> for BTreeSet<T> where T: Eq + Hash + Ord
         {
             fn new() -> BTreeSet<T> { BTreeSet::new() }
