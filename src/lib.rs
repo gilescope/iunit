@@ -57,6 +57,15 @@ mod stdx {
             }
         }
 
+//        pub struct SetConventions{}
+//
+//        impl SetConventions {
+//            fn test(x: &Set<T>) {
+//                HashSet::<isize>::tests_isize::<BTreeSet<_>>();
+//                HashSet::<char>::tests_char::<BTreeSet<_>>();
+//                HashSet::<Foo>::tests_char::<BTreeSet<_>>();
+//            }
+//        }
 
         //TODO link to conventions
         pub trait Set<T> where T: Eq + Hash
@@ -91,7 +100,11 @@ mod stdx {
                 where Iter: IntoIterator<Item=T>;
 
             fn iter<'a>(&'a self) -> Box<Iterator<Item=&'a T> + 'a>;
+        }
 
+        #[cfg(test)]
+        pub trait SetTests<T> : Set<T> where T: Eq + Hash
+        {
             //TODO: start autogen this?
             #[cfg(test)]
             fn tests_isize<S>()
@@ -426,6 +439,8 @@ mod stdx {
             }
         }
 
+        impl <T> SetTests<T> for HashSet<T> where T: Eq + Hash {}
+        impl <T> SetTests<T> for BTreeSet<T> where T: Eq + Hash + Ord {}
 
         //TODO auto-generate start
         #[cfg(test)]
