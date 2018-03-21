@@ -39,9 +39,9 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
         match item.node {
             ItemKind::Trait(a, b, ref c, ref d,  ref trait_items) => {
                 let mut test_names = vec![];
-                for meth in trait_items {
-                    test_names.push(meth.ident.name);
-                }
+//                for meth in trait_items {
+//                    test_names.push(meth.ident.name);
+//                }
 
 
 
@@ -65,35 +65,38 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
 //                    Some(cx.block(span, vec![])));
 
              //   let fn_call = quote_item!{ Self::test_all(); };
-                let fn_call = Stmt {
-                    id: ast::DUMMY_NODE_ID,
-                    node: StmtKind::Semi(P(Expr{
+                for meth in trait_items {
+                    let fn_call = Stmt {
                         id: ast::DUMMY_NODE_ID,
-                        node: ExprKind::Call(P(Expr {
-                            span,
-                            attrs:ThinVec::new(),
-                            id:ast::DUMMY_NODE_ID,
-                                             node:
-                            ExprKind::Path(None, ::syntax::ast::Path {
+                        node: StmtKind::Semi(P(Expr {
+                            id: ast::DUMMY_NODE_ID,
+                            node: ExprKind::Call(P(Expr {
                                 span,
-                                segments: vec![PathSegment { span, parameters: None, identifier: Ident::from_str("test_all") }, ]
-                            }
-                            )
-                        }), vec![]),
+                                attrs: ThinVec::new(),
+                                id: ast::DUMMY_NODE_ID,
+                                node:
+                                ExprKind::Path(None, ::syntax::ast::Path {
+                                    span,
+                                    segments: vec![
+                                        PathSegment { span, parameters: None, identifier: Ident::from_str("Self") },
+                                        PathSegment { span, parameters: None, identifier: meth.ident.clone() },
+                                    ]
+                                }
+                                )
+                            }), vec![]),
+                            span,
+                            attrs: ThinVec::new()
+                        })),
                         span,
-                        attrs: ThinVec::new()
-                    })),
-                    span,
-                };
-
+                    };
+                    test_names.push(fn_call);
+                }
 //                Some(QPath), PAth(None, )){
 //                identifier: Ident::from_str("test_all"),
 //                span,
 //                parameters: Some(P(PathParameters::Parenthesized(ParenthesizedParameterData{ span, inputs:vec![], output:None})))
 
-                let body = cx.block(span, vec![
-                    fn_call
-                ]);
+                let body = cx.block(span, test_names);
                 //let my_fn = cx.item_fn(span, Ident::from_str("test_all"), vec![], cx.ty(span, TyKind::Tup(vec![])), body);
 //                let new_trait = item.clone();
 //                new_trait.trait_items.push(my_fn);

@@ -192,15 +192,14 @@ mod stdx {
                 }
             }
 
-            //TODO use procedural macro to autogenerate the test_all function.
             #[trait_tests]
-            pub trait SetTestsisize: Set<isize> + Sized
-            + IntoIterator<Item=isize>
-            + Debug + Eq
-            + FromIterator<isize>
+            pub trait SetTestsisize: Set<isize>
+                + FromIterator<isize> + IntoIterator<Item=isize>
+                + Debug + Eq + Sized
             {
                 // This is sub-optimal but currently #[test] excludes all generics.is_parameterized()
                 // despite their being no unfilled parameters. (src/libsyntax/test.rs)
+                // We are autogenerating this function using a compiler plugin: #[trait_tests]
 //                fn test_all() {
 //                    Self::test_disjoint();
 //                    Self::test_subset_and_superset();
@@ -478,11 +477,9 @@ mod stdx {
                 }
             }
 
+            #[trait_tests]
             pub trait SetTestsfoo: Set<Foo> + Sized + IntoIterator<Item=Foo>
             {
-                fn test_all() {
-                    Self::test_replace();
-                }
                 #[test]
                 fn test_replace()
                 {
@@ -498,11 +495,9 @@ mod stdx {
                 }
             }
 
+            #[trait_tests]
             pub trait SetTestschar: Set<char> + Sized + IntoIterator<Item=char>
             {
-                fn test_all() {
-                    Self::test_move_iter();
-                }
                 #[test]
                 fn test_move_iter()
                 {
@@ -535,12 +530,12 @@ mod stdx {
             }
 
             trait_test!(HashSet<isize>, SetTestsisize, isize, test1, HashSet::<isize>::test_all);
-           // trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
-           // trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
+            trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
+            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
 
             trait_test!(BTreeSet<isize>, SetTestsisize, isize, test4, BTreeSet::<isize>::test_all);
-          //  trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
-          //  trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
+            trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
+            trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
 
             //Derive macro
             //impl SetTestsisize for HashSet<isize> {}
