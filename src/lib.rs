@@ -9,7 +9,10 @@
 //!
 //! [ ] Tests covering multiple Traits
 //!
-//#![feature(custom_attribute)]
+#![feature(custom_attribute)]
+#![feature(plugin)]
+#![plugin(test_trait_derive)]
+
 //#[macro_use] extern crate test_trait_derive;
 
 mod stdx {
@@ -17,9 +20,7 @@ mod stdx {
         use ::std::collections::btree_set::BTreeSet;
         use ::std::collections::HashSet;
         use ::std::hash::Hash;
-        use ::std::fmt::Debug;
-        use ::std::iter::{IntoIterator, FromIterator};
-        use ::std::hash as hash;
+        use ::std::iter::IntoIterator;
 
         pub trait Set<T> where T: Eq + Hash
         {
@@ -158,6 +159,9 @@ mod stdx {
         #[cfg(test)]
         mod tests {
             use super::*;
+            use ::std::fmt::Debug;
+            use ::std::iter::FromIterator;
+            use ::std::hash as hash;
 
             #[derive(Debug)]
             pub struct Foo(&'static str, i32);
@@ -189,6 +193,7 @@ mod stdx {
             }
 
             //TODO use procedural macro to autogenerate the test_all function.
+            #[trait_tests]
             pub trait SetTestsisize: Set<isize> + Sized
             + IntoIterator<Item=isize>
             + Debug + Eq
@@ -196,23 +201,24 @@ mod stdx {
             {
                 // This is sub-optimal but currently #[test] excludes all generics.is_parameterized()
                 // despite their being no unfilled parameters. (src/libsyntax/test.rs)
-                fn test_all() {
-                    Self::test_disjoint();
-                    Self::test_subset_and_superset();
-                    Self::test_iterate();
-                    Self::test_intersection();
-                    Self::test_difference();
-                    Self::test_symmetric_difference();
-                    Self::test_union();
-                    Self::test_from_iter();
-                    Self::test_eq();
-                    Self::test_show();
-                    Self::test_extend_ref();
-                }
+//                fn test_all() {
+//                    Self::test_disjoint();
+//                    Self::test_subset_and_superset();
+//                    Self::test_iterate();
+//                    Self::test_intersection();
+//                    Self::test_difference();
+//                    Self::test_symmetric_difference();
+//                    Self::test_union();
+//                    Self::test_from_iter();
+//                    Self::test_eq();
+//                    Self::test_show();
+//                    Self::test_extend_ref();
+//                }
 
                 #[test]
                 fn test_disjoint()
                 {
+                    println!("test disjoint running");
                     let mut xs = Self::new();
                     let mut ys = Self::new();
                     assert!(xs.is_disjoint(&ys));
@@ -236,6 +242,8 @@ mod stdx {
                 #[test]
                 fn test_subset_and_superset()
                 {
+                    println!("test subset running");
+
                     let mut a = Self::new();
                     assert!(a.insert(0));
                     assert!(a.insert(5));
@@ -519,21 +527,41 @@ mod stdx {
             use super::tests::*;
             use super::*;
 
-            impl SetTestsisize for HashSet<isize> {}
-            impl SetTestschar for HashSet<char> {}
-            impl SetTestsfoo for HashSet<Foo> {}
+            macro_rules! trait_test {
+                ($impl_name:ty, $test_name:ty, $test_type:ty, $id:ident, $test_path:path) => (
+                        impl $test_name for $impl_name {}
+                        #[test] fn $id() { $test_path(); }
+                )
+            }
 
-            #[test] fn HashSet_tests1() { HashSet::<isize>::test_all(); }
-            #[test] fn HashSet_tests2() { HashSet::<char>::test_all(); }
-            #[test] fn HashSet_tests3() { HashSet::<Foo>::test_all(); }
+            trait_test!(HashSet<isize>, SetTestsisize, isize, test1, HashSet::<isize>::test_all);
+           // trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
+           // trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
 
-            impl SetTestsisize for BTreeSet<isize> {}
-            impl SetTestschar for BTreeSet<char> {}
-            impl SetTestsfoo for BTreeSet<Foo> {}
+            trait_test!(BTreeSet<isize>, SetTestsisize, isize, test4, BTreeSet::<isize>::test_all);
+          //  trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
+          //  trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
 
-            #[test] fn BTreeSet_tests1() { BTreeSet::<isize>::test_all(); }
-            #[test] fn BTreeSet_tests2() { BTreeSet::<char>::test_all(); }
-            #[test] fn BTreeSet_tests3() { BTreeSet::<Foo>::test_all(); }
+            //Derive macro
+            //impl SetTestsisize for HashSet<isize> {}
+//            impl SetTestschar for HashSet<char> {}
+//            impl SetTestsfoo for HashSet<Foo> {}
+
+            //#[derive(TraitTests)]
+            //#[ForType(isize)]
+            //impl SetTestsisize for HashSet<isize> {}
+            //#[test] fn HashSet_tests1() { HashSet::<isize>::test_all(); }
+
+            //#[test] fn HashSet_tests2() { HashSet::<char>::test_all(); }
+            //#[test] fn HashSet_tests3() { HashSet::<Foo>::test_all(); }
+
+//            impl SetTestsisize for BTreeSet<isize> {}
+//            impl SetTestschar for BTreeSet<char> {}
+//            impl SetTestsfoo for BTreeSet<Foo> {}
+//
+//            #[test] fn BTreeSet_tests1() { BTreeSet::<isize>::test_all(); }
+//            #[test] fn BTreeSet_tests2() { BTreeSet::<char>::test_all(); }
+//            #[test] fn BTreeSet_tests3() { BTreeSet::<Foo>::test_all(); }
         }
     }
 }
