@@ -3,17 +3,17 @@
 //!
 //! [x] Trait linked to TraitTests
 //!
-//! [ ] Impl annotation creates tests.
+//! [x] Impl annotation creates tests.
 //!
 //! additional:
 //!
-//! [ ] Tests covering multiple Traits
+//! [x] Tests covering multiple Traits
+//!
+//! [ ] Each test is counted as a unique test. (Currently each set of trait tests counts as only 1 test).
 //!
 #![feature(custom_attribute)]
 #![feature(plugin)]
 #![plugin(test_trait_derive)]
-
-//#[macro_use] extern crate test_trait_derive;
 
 mod stdx {
     mod collections {
@@ -194,30 +194,16 @@ mod stdx {
 
             #[trait_tests]
             pub trait SetTestsisize: Set<isize>
-                + FromIterator<isize> + IntoIterator<Item=isize>
+                + FromIterator<isize>
+                + IntoIterator<Item=isize>
                 + Debug + Eq + Sized
             {
                 // This is sub-optimal but currently #[test] excludes all generics.is_parameterized()
                 // despite their being no unfilled parameters. (src/libsyntax/test.rs)
-                // We are autogenerating this function using a compiler plugin: #[trait_tests]
-//                fn test_all() {
-//                    Self::test_disjoint();
-//                    Self::test_subset_and_superset();
-//                    Self::test_iterate();
-//                    Self::test_intersection();
-//                    Self::test_difference();
-//                    Self::test_symmetric_difference();
-//                    Self::test_union();
-//                    Self::test_from_iter();
-//                    Self::test_eq();
-//                    Self::test_show();
-//                    Self::test_extend_ref();
-//                }
+                // We are autogenerating a test_all() function using a compiler plugin: #[trait_tests]
 
-                //#[test]
                 fn test_disjoint()
                 {
-                    println!("test disjoint running");
                     let mut xs = Self::new();
                     let mut ys = Self::new();
                     assert!(xs.is_disjoint(&ys));
@@ -238,11 +224,8 @@ mod stdx {
                     assert!(!ys.is_disjoint(&xs));
                 }
 
-                //#[test]
                 fn test_subset_and_superset()
                 {
-                    println!("test subset running");
-
                     let mut a = Self::new();
                     assert!(a.insert(0));
                     assert!(a.insert(5));
@@ -270,7 +253,6 @@ mod stdx {
                     assert!(b.is_superset(&a));
                 }
 
-                //#[test]
                 fn test_iterate()
                 {
                     let mut a = Self::new();
@@ -284,7 +266,6 @@ mod stdx {
                     assert_eq!(observed, 0xFFFF_FFFF);
                 }
 
-                //#[test]
                 fn test_intersection()
                 {
                     let mut a = Self::new();
@@ -315,7 +296,6 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                //#[test]
                 fn test_difference()
                 {
                     let mut a = Self::new();
@@ -339,7 +319,6 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                //#[test]
                 fn test_symmetric_difference()
                 {
                     let mut a = Self::new();
@@ -366,7 +345,6 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                //#[test]
                 fn test_union()
                 {
                     let mut a = Self::new();
@@ -397,7 +375,6 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                //#[test]
                 fn test_from_iter()
                 {
                     let xs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -409,7 +386,6 @@ mod stdx {
                     }
                 }
 
-                //#[test]
                 fn test_eq()
                 {
                     // These constants once happened to expose a bug in insert().
@@ -432,7 +408,6 @@ mod stdx {
                     assert_eq!(s1, s2);
                 }
 
-                //#[test]
                 fn test_show()
                 {
                     let mut set = Self::new();
@@ -447,7 +422,6 @@ mod stdx {
                     assert_eq!(format!("{:?}", empty), "{}");
                 }
 
-                //#[test]
                 fn test_extend_ref()
                 {
                     let mut a = Self::new();
@@ -480,7 +454,6 @@ mod stdx {
             #[trait_tests]
             pub trait SetTestsfoo: Set<Foo> + Sized + IntoIterator<Item=Foo>
             {
-                //#[test]
                 fn test_replace()
                 {
                     let mut s = Self::new();
@@ -522,28 +495,7 @@ mod stdx {
             use super::tests::*;
             use super::*;
 
-//            macro_rules! trait_test {
-//                ($impl_name:ty, $test_name:ty, $test_type:ty, $id:ident, $test_path:path) => (
-//                        impl $test_name for $impl_name {}
-//                        #[test] fn $id() { $test_path(); }
-//                )
-//            }
-
-
-
-//            trait_test!(HashSet<isize>, SetTestsisize, isize, test1, HashSet::<isize>::test_all);
-//            trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
-//            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
-
-//            trait_test!(BTreeSet<isize>, SetTestsisize, isize, test4, BTreeSet::<isize>::test_all);
-//            trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
-//            trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
-//
-            /// isize,Foo,char
-            ///
-            /// SetTests for HashSet
-            ///
-
+            //MySet example of minimal implementation to run the tests.
             #[derive(Debug,Eq,PartialEq)]
             struct MySet<T> {
                 store: Vec<T>,
@@ -637,49 +589,9 @@ mod stdx {
             #[trait_tests] impl SetTestsfoo for BTreeSet<Foo> {}
             #[trait_tests] impl SetTestschar for BTreeSet<char> {}
 
-
             #[trait_tests] impl SetTestsisize for MySet<isize> {}
             #[trait_tests] impl SetTestsfoo for MySet<Foo> {}
             #[trait_tests] impl SetTestschar for MySet<char> {}
-//            #[test]
-//            fn T() {
-//                <::std::collections::HashSet<isize> as ::stdx::collections::tests::SetTestsisize>::test_all();
-//
-////                HashSet::<isize>::test_all();
-////                ::std::collections::HashSet::<isize>::test_all();
-////                ::stdx::collections::impl_tests::HashSet::<isize>::test_all();
-//            }
-
-
-//            #[trait_tests]
-//            impl SetTestsfoo for HashSet<Foo> {}
-
-//            #[trait_tests]
-//            impl SetTestsisize for MySet<isize> {}
-//
-//            #[test] fn any_name() { MySet::<isize>::test_all(); }
-//
-//            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3n, HashSet::<Foo>);
-
-
-//            impl SetTestschar for HashSet<char> {}
-//            impl SetTestsfoo for HashSet<Foo> {}
-
-            //#[derive(TraitTests)]
-            //#[ForType(isize)]
-            //impl SetTestsisize for HashSet<isize> {}
-            //#[test] fn HashSet_tests1() { HashSet::<isize>::test_all(); }
-
-            //#[test] fn HashSet_tests2() { HashSet::<char>::test_all(); }
-            //#[test] fn HashSet_tests3() { HashSet::<Foo>::test_all(); }
-
-//            impl SetTestsisize for BTreeSet<isize> {}
-//            impl SetTestschar for BTreeSet<char> {}
-//            impl SetTestsfoo for BTreeSet<Foo> {}
-//
-//            #[test] fn BTreeSet_tests1() { BTreeSet::<isize>::test_all(); }
-//            #[test] fn BTreeSet_tests2() { BTreeSet::<char>::test_all(); }
-//            #[test] fn BTreeSet_tests3() { BTreeSet::<Foo>::test_all(); }
         }
     }
 }
