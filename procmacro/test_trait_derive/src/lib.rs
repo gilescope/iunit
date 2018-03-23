@@ -1,18 +1,19 @@
 #![crate_type = "dylib"]
 #![feature(plugin_registrar, rustc_private)]
 
-#[macro_use] extern crate syntax;
+extern crate syntax;
 extern crate rustc_plugin;
 
+//use syntax::ast_map::Map;
 use syntax::abi::Abi;
 use syntax::tokenstream::{TokenStream};
 use syntax::ast;
 use syntax::util::ThinVec;
-use syntax::ext::quote::rt::Span;
-use syntax::ext::hygiene::SyntaxContext;
-use syntax::ast::{Ident, Item, PathParameters, PathSegment, ParenthesizedParameterData, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,TraitItemKind,
+//use syntax::ext::quote::rt::Span;
+//use syntax::ext::hygiene::SyntaxContext;
+//use syntax::ast::Ty_Unstable::Ty_;
+use syntax::ast::{Ident, Item, TraitRef, PathParameters,Ty, PathSegment, ParenthesizedParameterData, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,TraitItemKind,
                   Block, Unsafety, Constness, FunctionRetTy, FnDecl,BlockCheckMode,NodeId };
-use syntax::ext::quote::rt::BytePos;
 use syntax::codemap;
 use syntax::codemap::Spanned;
 use syntax::ext::base::{ExtCtxt, MultiModifier, Annotatable};
@@ -32,11 +33,86 @@ pub fn plugin_registrar(reg: &mut Registry) {
 fn expand_meta_trait_test(cx: &mut ExtCtxt,
                           span: codemap::Span,
                           _: &ast::MetaItem,
-                          annot_item: Annotatable) -> Annotatable {
+                          annot_item: Annotatable) -> Vec<Annotatable> {
     let item_kind;
-    let mut item = annot_item.expect_item();
+    let item = annot_item.expect_item();
     {
         match item.node {
+            // Impl(Unsafety, ImplPolarity, Defaultness, Generics, Option<TraitRef>, P<Ty>, Vec<ImplItem>),
+            ItemKind::Impl(_a,_b,_c,ref _d, Some(TraitRef{ path: ref trait_ref, ref_id:_}), ref impl_type,ref _g) => {
+                //We look like: impl SetTestsisize for MySet<isize> {}
+                //println!("{:#?}", &_e);
+                println!("{:#?}", &impl_type);//type(MySet<isize>)
+
+                let y  : &Ty = &*(impl_type.clone());
+                match y.node {
+                    //Ty_Unstable::TyVec(x) => {},
+                    _ => {}
+                }
+
+                let s : String = format!("{:?}",y);
+                let mut type_param = None;
+                let z : &str = if let Some(idx) = s.find('<') {
+                    type_param = Some(&s[idx .. s.len()-1]);
+                    &s[5..idx]
+                } else {
+                    &s[5..s.len()-1]
+                };
+
+                let trait_name = format!("{:?}", trait_ref);
+                let trait_name_lower = trait_name[5..trait_name.len()-1].to_lowercase();
+
+//                let test_all_call = Stmt {
+//                    id: ast::DUMMY_NODE_ID,
+//                    node: StmtKind::Expr(cx.expr_call_global(span, vec![
+//                        Ident::from_str("stdx"),
+//                        Ident::from_str("collections"),
+//                        Ident::from_str("impl_tests"),
+//                        Ident::from_str("<isize>"),
+////Ident::from_str(&z),
+////Ident::from_str(type_param.unwrap()), //E.g. <isize>
+//Ident::from_str("pri")], vec![])),
+//                    span,
+//                };
+
+                let test_all_call = Stmt {
+                    id: ast::DUMMY_NODE_ID,
+                    node: StmtKind::Expr(cx.expr_call_global(span, vec![
+                        Ident::from_str("std"),
+                        Ident::from_str("collections"),
+//                        Ident::from_str("stdx"),
+//                        Ident::from_str("collections"),
+//                        Ident::from_str("impl_tests"),
+                        Ident::from_str(&z),
+                    //    Ident::from_str(type_param.unwrap()), //E.g. <isize>
+                        Ident::from_str("test_all")], vec![])),
+                    span,
+                };
+
+    let body = cx.block(span, vec![test_all_call]);
+
+
+    let test = cx.item_fn(span, Ident::from_str(&(String::from("test_") + &trait_name_lower + "_" + &z.to_lowercase())), vec![], cx.ty(span, TyKind::Tup(vec![])), body);
+
+                println!("{:#?}", &test);//type(MySet<isize>)
+
+    // Copy attributes from original function
+    let mut attrs = item.attrs.clone();
+    // Add #[test] attribute
+    attrs.push(cx.attribute(
+        span, cx.meta_word(span, Symbol::intern("test"))));
+    // Attach the attributes to the outer function
+    let test_fn = Annotatable::Item(P(ast::Item {attrs, ..(*test).clone()}));
+
+
+
+
+                return  vec![
+                             Annotatable::Item(P(Item{attrs: Vec::new(), ..(*item).clone() })),
+                test_fn,];
+                //#[test] fn any_name() { MySet::<isize>::test_all(); }
+
+            },
             ItemKind::Trait(a, b, ref c, ref d,  ref trait_items) => {
                 let mut test_names = vec![];
 //                for meth in trait_items {
@@ -135,7 +211,7 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
                 let mut items = trait_items.clone();
                 items.push(prop);
                 item_kind = ItemKind::Trait(a, b, c.clone(), d.clone(), items);
-                return Annotatable::Item(P(Item{ node: item_kind, ..(*item).clone() }))
+                return vec![Annotatable::Item(P(Item{ node: item_kind, ..(*item).clone() }))]
 //                return Annotatable::Item(P(ast::Item { ..(*my_fn).clone()}));
 
 //
@@ -171,46 +247,46 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
 //        },
             _ => {
                 cx.span_err(
-                    span, "#[trait_tests] only supported on traits");
+                    span, "#[trait_tests] only supported on traits and impls");
             }
         }
     }
-    Annotatable::Item(P(Item{  ..(*item).clone() }))
+    vec![Annotatable::Item(P(Item{  ..(*item).clone() }))]
 }
 
-
-fn wrap_item(cx: &mut ExtCtxt,
-             span: codemap::Span,
-             item: &ast::Item,
-             inner_ident: P<ast::Expr>) -> Annotatable {
-    // Copy original function without attributes
-    let prop = P(ast::Item {attrs: Vec::new(), ..item.clone()});
-    // ::quickcheck::quickcheck
-    let check_ident = Ident::from_str("quickcheck");
-    let check_path = vec!(check_ident, check_ident);
-    // Wrap original function in new outer function,
-    // calling ::quickcheck::quickcheck()
-    let fn_decl = Stmt {
-        id: ast::DUMMY_NODE_ID,
-        node: StmtKind::Item(prop),
-        span: span,
-    };
-    let check_call = Stmt {
-        id: ast::DUMMY_NODE_ID,
-        node: StmtKind::Expr(cx.expr_call_global(span, check_path, vec![inner_ident])),
-        span: span,
-    };
-    let body = cx.block(span, vec![fn_decl, check_call]);
-    let test = cx.item_fn(span, item.ident, vec![], cx.ty(span, TyKind::Tup(vec![])), body);
-
-    // Copy attributes from original function
-    let mut attrs = item.attrs.clone();
-    // Add #[test] attribute
-    attrs.push(cx.attribute(
-        span, cx.meta_word(span, Symbol::intern("test"))));
-    // Attach the attributes to the outer function
-    Annotatable::Item(P(ast::Item {attrs: attrs, ..(*test).clone()}))
-}
+//
+//fn wrap_item(cx: &mut ExtCtxt,
+//             span: codemap::Span,
+//             item: &ast::Item,
+//             inner_ident: P<ast::Expr>) -> Annotatable {
+//    // Copy original function without attributes
+//    let prop = P(ast::Item {attrs: Vec::new(), ..item.clone()});
+//    // ::quickcheck::quickcheck
+//    let check_ident = Ident::from_str("quickcheck");
+//    let check_path = vec!(check_ident, check_ident);
+//    // Wrap original function in new outer function,
+//    // calling ::quickcheck::quickcheck()
+//    let fn_decl = Stmt {
+//        id: ast::DUMMY_NODE_ID,
+//        node: StmtKind::Item(prop),
+//        span: span,
+//    };
+//    let check_call = Stmt {
+//        id: ast::DUMMY_NODE_ID,
+//        node: StmtKind::Expr(cx.expr_call_global(span, check_path, vec![inner_ident])),
+//        span: span,
+//    };
+//    let body = cx.block(span, vec![fn_decl, check_call]);
+//    let test = cx.item_fn(span, item.ident, vec![], cx.ty(span, TyKind::Tup(vec![])), body);
+//
+//    // Copy attributes from original function
+//    let mut attrs = item.attrs.clone();
+//    // Add #[test] attribute
+//    attrs.push(cx.attribute(
+//        span, cx.meta_word(span, Symbol::intern("test"))));
+//    // Attach the attributes to the outer function
+//    Annotatable::Item(P(ast::Item {attrs: attrs, ..(*test).clone()}))
+//}
 
 //
 //

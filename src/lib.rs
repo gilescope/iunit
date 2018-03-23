@@ -214,7 +214,7 @@ mod stdx {
 //                    Self::test_extend_ref();
 //                }
 
-                #[test]
+                //#[test]
                 fn test_disjoint()
                 {
                     println!("test disjoint running");
@@ -238,7 +238,7 @@ mod stdx {
                     assert!(!ys.is_disjoint(&xs));
                 }
 
-                #[test]
+                //#[test]
                 fn test_subset_and_superset()
                 {
                     println!("test subset running");
@@ -270,7 +270,7 @@ mod stdx {
                     assert!(b.is_superset(&a));
                 }
 
-                #[test]
+                //#[test]
                 fn test_iterate()
                 {
                     let mut a = Self::new();
@@ -284,7 +284,7 @@ mod stdx {
                     assert_eq!(observed, 0xFFFF_FFFF);
                 }
 
-                #[test]
+                //#[test]
                 fn test_intersection()
                 {
                     let mut a = Self::new();
@@ -315,7 +315,7 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                #[test]
+                //#[test]
                 fn test_difference()
                 {
                     let mut a = Self::new();
@@ -339,7 +339,7 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                #[test]
+                //#[test]
                 fn test_symmetric_difference()
                 {
                     let mut a = Self::new();
@@ -366,7 +366,7 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                #[test]
+                //#[test]
                 fn test_union()
                 {
                     let mut a = Self::new();
@@ -397,7 +397,7 @@ mod stdx {
                     assert_eq!(i, expected.len());
                 }
 
-                #[test]
+                //#[test]
                 fn test_from_iter()
                 {
                     let xs = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -409,7 +409,7 @@ mod stdx {
                     }
                 }
 
-                #[test]
+                //#[test]
                 fn test_eq()
                 {
                     // These constants once happened to expose a bug in insert().
@@ -432,7 +432,7 @@ mod stdx {
                     assert_eq!(s1, s2);
                 }
 
-                #[test]
+                //#[test]
                 fn test_show()
                 {
                     let mut set = Self::new();
@@ -447,7 +447,7 @@ mod stdx {
                     assert_eq!(format!("{:?}", empty), "{}");
                 }
 
-                #[test]
+                //#[test]
                 fn test_extend_ref()
                 {
                     let mut a = Self::new();
@@ -480,7 +480,7 @@ mod stdx {
             #[trait_tests]
             pub trait SetTestsfoo: Set<Foo> + Sized + IntoIterator<Item=Foo>
             {
-                #[test]
+                //#[test]
                 fn test_replace()
                 {
                     let mut s = Self::new();
@@ -498,7 +498,7 @@ mod stdx {
             #[trait_tests]
             pub trait SetTestschar: Set<char> + Sized + IntoIterator<Item=char>
             {
-                #[test]
+                //#[test]
                 fn test_move_iter()
                 {
                     let hs = {
@@ -522,23 +522,143 @@ mod stdx {
             use super::tests::*;
             use super::*;
 
-            macro_rules! trait_test {
-                ($impl_name:ty, $test_name:ty, $test_type:ty, $id:ident, $test_path:path) => (
-                        impl $test_name for $impl_name {}
-                        #[test] fn $id() { $test_path(); }
-                )
+//            macro_rules! trait_test {
+//                ($impl_name:ty, $test_name:ty, $test_type:ty, $id:ident, $test_path:path) => (
+//                        impl $test_name for $impl_name {}
+//                        #[test] fn $id() { $test_path(); }
+//                )
+//            }
+
+
+
+//            trait_test!(HashSet<isize>, SetTestsisize, isize, test1, HashSet::<isize>::test_all);
+//            trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
+//            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
+
+//            trait_test!(BTreeSet<isize>, SetTestsisize, isize, test4, BTreeSet::<isize>::test_all);
+//            trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
+//            trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
+//
+            /// isize,Foo,char
+            ///
+            /// SetTests for HashSet
+            ///
+
+            #[derive(Debug,Eq,PartialEq)]
+            struct MySet<T> {
+                store: Vec<T>,
             }
 
-            trait_test!(HashSet<isize>, SetTestsisize, isize, test1, HashSet::<isize>::test_all);
-            trait_test!(HashSet<char>, SetTestschar,  char, test2, HashSet::<char>::test_all);
-            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3, HashSet::<Foo>::test_all);
+            impl <I> ::std::iter::FromIterator<I> for MySet<I> {
+                fn from_iter<T: IntoIterator<Item=I>>(_iter: T) -> Self {
+                    //<::stdx::collections::impl_tests::MySet::<isize> as SetTestsisize>::test_all();
+                    unimplemented!()
+                }
+            }
 
-            trait_test!(BTreeSet<isize>, SetTestsisize, isize, test4, BTreeSet::<isize>::test_all);
-            trait_test!(BTreeSet<char>, SetTestschar,  char, test5, BTreeSet::<char>::test_all);
-            trait_test!(BTreeSet<Foo>, SetTestsfoo,  Foo, test6, BTreeSet::<Foo>::test_all);
+            impl <T> Set<T> for MySet<T>
+                where T : Hash + Eq
+            {
+                fn new() -> Self {
+                    unimplemented!()
+                }
+
+                fn insert(&mut self, _item: T) -> bool {
+                    unimplemented!()
+                }
+
+                fn is_disjoint(&self, _other: &Self) -> bool {
+                    unimplemented!()
+                }
+
+                fn is_subset(&self, _other: &Self) -> bool {
+                    unimplemented!()
+                }
+
+                fn is_superset(&self, _other: &Self) -> bool {
+                    unimplemented!()
+                }
+
+                fn intersection<'a>(&'a self, _other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a> {
+                    unimplemented!()
+                }
+
+                fn contains(&self, _item: &T) -> bool {
+                    unimplemented!()
+                }
+
+                fn difference<'a>(&'a self, _other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a> {
+                    unimplemented!()
+                }
+
+                fn symmetric_difference<'a>(&'a self, _other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a> {
+                    unimplemented!()
+                }
+
+                fn union<'a>(&'a self, _other: &'a Self) -> Box<Iterator<Item=&'a T> + 'a> {
+                    unimplemented!()
+                }
+
+                fn is_empty(&self) -> bool {
+                    unimplemented!()
+                }
+
+                fn len(&self) -> usize {
+                    unimplemented!()
+                }
+
+                fn replace(&mut self, _value: T) -> Option<T> {
+                    unimplemented!()
+                }
+
+                fn extend<Iter>(&mut self, _iter: Iter) where Iter: IntoIterator<Item=T> {
+                    unimplemented!()
+                }
+
+                fn iter<'a>(&'a self) -> Box<Iterator<Item=&'a T> + 'a> {
+                    unimplemented!()
+                }
+            }
+
+            impl <T> Iterator for MySet<T> {
+                type Item = T;
+
+                fn next(&mut self) -> Option<Self::Item> {
+                    unimplemented!()
+                }
+            }
 
             //Derive macro
-            //impl SetTestsisize for HashSet<isize> {}
+
+            fn pri<T>()
+                where T: ::std::fmt::Debug {
+                println!("Hello world1!!!!!");
+            }
+
+            #[trait_tests]
+            impl SetTestsisize for HashSet<isize> {}
+
+//            #[test]
+//            fn T() {
+//                <::std::collections::HashSet<isize> as ::stdx::collections::tests::SetTestsisize>::test_all();
+//
+////                HashSet::<isize>::test_all();
+////                ::std::collections::HashSet::<isize>::test_all();
+////                ::stdx::collections::impl_tests::HashSet::<isize>::test_all();
+//            }
+
+
+//            #[trait_tests]
+//            impl SetTestsfoo for HashSet<Foo> {}
+
+//            #[trait_tests]
+//            impl SetTestsisize for MySet<isize> {}
+//
+//            #[test] fn any_name() { MySet::<isize>::test_all(); }
+//
+//            trait_test!(HashSet<Foo>, SetTestsfoo,  Foo, test3n, HashSet::<Foo>);
+
+
 //            impl SetTestschar for HashSet<char> {}
 //            impl SetTestsfoo for HashSet<Foo> {}
 
