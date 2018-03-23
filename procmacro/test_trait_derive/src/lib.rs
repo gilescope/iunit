@@ -12,7 +12,7 @@ use syntax::util::ThinVec;
 //use syntax::ext::quote::rt::Span;
 //use syntax::ext::hygiene::SyntaxContext;
 //use syntax::ast::Ty_Unstable::Ty_;
-use syntax::ast::{Ident, Item, TraitRef, PathParameters,Ty, PathSegment, ParenthesizedParameterData, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,TraitItemKind,
+use syntax::ast::{Ident, Item, TraitRef,Path,  PathParameters,Ty,AngleBracketedParameterData, PathSegment, ParenthesizedParameterData, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,TraitItemKind,
                   Block, Unsafety, Constness, FunctionRetTy, FnDecl,BlockCheckMode,NodeId };
 use syntax::codemap;
 use syntax::codemap::Spanned;
@@ -52,7 +52,7 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
 
                 let s : String = format!("{:?}",y);
                 let mut type_param = None;
-                let z : &str = if let Some(idx) = s.find('<') {
+                let type_impl_name : &str = if let Some(idx) = s.find('<') {
                     type_param = Some(&s[idx .. s.len()-1]);
                     &s[5..idx]
                 } else {
@@ -75,24 +75,59 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
 //                    span,
 //                };
 
+                //let type_andparam = String::from(z) + type_param.unwrap();
+
+//                let fff:String = *cx.expr_call_global(span, vec![
+//                    Ident::from_str("std"),
+//                    Ident::from_str("collections"),
+////                        Ident::from_str("stdx"),
+////                        Ident::from_str("collections"),
+////                        Ident::from_str("impl_tests"),
+//                    //       Ident::from_str(&type_andparam ),
+//                    //    Ident::from_str(type_param.unwrap()), //E.g. <isize>
+//                    Ident::from_str("test_all")], vec![]);
+
+                let unangled = &(type_param.unwrap()[1 .. type_param.unwrap().len()-1]);
+
                 let test_all_call = Stmt {
                     id: ast::DUMMY_NODE_ID,
-                    node: StmtKind::Expr(cx.expr_call_global(span, vec![
-                        Ident::from_str("std"),
-                        Ident::from_str("collections"),
-//                        Ident::from_str("stdx"),
-//                        Ident::from_str("collections"),
-//                        Ident::from_str("impl_tests"),
-                        Ident::from_str(&z),
-                    //    Ident::from_str(type_param.unwrap()), //E.g. <isize>
-                        Ident::from_str("test_all")], vec![])),
+                    node: StmtKind::Expr(P(Expr{
+                        span,
+                        attrs: ThinVec::new(),
+                        id: ast::DUMMY_NODE_ID,
+                        node: ExprKind::Call(P(Expr {
+                            span,
+                            attrs: ThinVec::new(),
+                            id: ast::DUMMY_NODE_ID,
+                            node:
+                            ExprKind::Path(None, ::syntax::ast::Path {
+                                span,
+                                segments: vec![
+//                                    PathSegment { span, parameters: None, identifier: Ident::from_str("std") },
+//                                    PathSegment { span, parameters: None, identifier: Ident::from_str("collections") },
+                                    PathSegment { span, parameters: Some(P(PathParameters::AngleBracketed(AngleBracketedParameterData{
+                                        span,
+                                        lifetimes: vec![],
+                                        bindings: vec![],
+                                        types: vec![P(Ty{
+                                            id: ast::DUMMY_NODE_ID,
+                                            node : TyKind::Path(None,Path{segments: vec![ PathSegment{ span, parameters: None, identifier: Ident::from_str(unangled) } ], span}),//tODO!!
+                                            span})]
+
+                                    }))), identifier: Ident::from_str("HashSet") },
+                                    PathSegment { span, parameters: None, identifier: Ident::from_str("test_all") },
+                                ]
+                            }
+                            )
+                        }), vec![])
+                    })),
                     span,
                 };
 
     let body = cx.block(span, vec![test_all_call]);
 
 
-    let test = cx.item_fn(span, Ident::from_str(&(String::from("test_") + &trait_name_lower + "_" + &z.to_lowercase())), vec![], cx.ty(span, TyKind::Tup(vec![])), body);
+    let test = cx.item_fn(span, Ident::from_str(&(String::from("test_") + &trait_name_lower + "_" + &type_impl_name.to_lowercase())), vec![], cx.ty(span, TyKind::Tup(vec![])), body);
 
                 println!("{:#?}", &test);//type(MySet<isize>)
 

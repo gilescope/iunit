@@ -628,16 +628,19 @@ mod stdx {
                 }
             }
 
-            //Derive macro
 
-            fn pri<T>()
-                where T: ::std::fmt::Debug {
-                println!("Hello world1!!!!!");
-            }
+            #[trait_tests] impl SetTestsisize for HashSet<isize> {}
+            #[trait_tests] impl SetTestsfoo for HashSet<Foo> {}
+            #[trait_tests] impl SetTestschar for HashSet<char> {}
 
-            #[trait_tests]
-            impl SetTestsisize for HashSet<isize> {}
+            #[trait_tests] impl SetTestsisize for BTreeSet<isize> {}
+            #[trait_tests] impl SetTestsfoo for BTreeSet<Foo> {}
+            #[trait_tests] impl SetTestschar for BTreeSet<char> {}
 
+
+            #[trait_tests] impl SetTestsisize for MySet<isize> {}
+            #[trait_tests] impl SetTestsfoo for MySet<Foo> {}
+            #[trait_tests] impl SetTestschar for MySet<char> {}
 //            #[test]
 //            fn T() {
 //                <::std::collections::HashSet<isize> as ::stdx::collections::tests::SetTestsisize>::test_all();
