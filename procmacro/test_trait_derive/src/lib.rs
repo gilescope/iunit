@@ -36,7 +36,7 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
             ItemKind::Impl(_, _, _, _, Some(TraitRef { path: ref trait_ref, ref_id:_} ),
                             ref impl_type, _) => {
                 //We look like: impl SetTestsisize for MySet<isize> {}
-                
+
                 let s : String = format!("{:?}",impl_type);
                 let mut type_param = None;
                 let type_impl_name : &str = if let Some(idx) = s.find('<') { // TODO dodgy
