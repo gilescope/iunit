@@ -5,7 +5,7 @@ extern crate syntax;
 extern crate rustc_plugin;
 
 use syntax::abi::Abi;
-use syntax::ast::{self, Ident, Item, TraitRef,Path,  PathParameters, Ty, AngleBracketedParameterData,
+use syntax::ast::{self, Ident, Generics, Item, TraitRef,Path, WhereClause, PathParameters, Ty, AngleBracketedParameterData,
                   PathSegment, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,
                   Unsafety, Constness, FunctionRetTy, FnDecl };
 use syntax::codemap::{ self, Spanned};
@@ -155,7 +155,10 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
                     tokens: Some(TokenStream::empty()),
                     id:ast::DUMMY_NODE_ID,
                     span,
-                    generics: trait_items[0].generics.clone(),
+                    generics: Generics{span, where_clause:WhereClause{
+                        id:ast::DUMMY_NODE_ID,
+                        span,
+                        predicates:vec![]}, params:vec![]},
                     node: func
                 };
 
