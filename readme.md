@@ -61,6 +61,15 @@ trait_tests = "*"
 iunit = "*"
 ```
 
+## Example Trait Tests
+
+To demonstrate the power of trait tests we need some traits. 
+
+The eclectic crate ( https://github.com/apasel422/eclectic ) defines a set of collection traits for the standard collections. 
+(Collections traits were in Rust pre 1.0 but were not ready for inclusion into v1.0 so were removed.)
+
+In this repository you will find some of the Rust collection tests recycled to exercise the collection traits.
+
 ## Open Questions
 
   1. How do we get the test framework to enumerate all the individual tests.

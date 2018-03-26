@@ -1,6 +1,8 @@
-use super::super::List;
+//use super::super::List;
 use std::fmt::Debug;
-use std::collections::LinkedList;
+//use std::collections::LinkedList;
+
+use eclectic::{List, AddRemove, Mutate};
 
 //pub struct DropCounter<'a> {
 //    count: &'a mut u32,
@@ -46,12 +48,17 @@ use std::collections::LinkedList;
 //    }
 
 #[trait_tests]
-pub trait ListTests: List<isize>
+pub trait ListTests: List<Item=isize>
     + PartialEq
-    + Debug + Sized
+    + Debug
+    + Sized
+    + AddRemove
+    + Mutate
+
   //  + Index<usize, Output=isize> - not supported by linked list.
 {
-    fn a_Test() {}
+    fn new() -> Self;
+
 //    fn test_retain() {
 //        //TODO WAS let mut vec = vec![1, 2, 3, 4];
 //        let vec = &mut Self::new();
@@ -70,40 +77,38 @@ pub trait ListTests: List<isize>
 //        assert_eq!(res.next(), None);
 //    }
 
-//    fn zero_sized_values() {
-//        let mut v = Self::new();
-//        assert_eq!(v.len(), 0);
-//        v.push(1);
-//        assert_eq!(v.len(), 1);
-//        v.push(1);
-//        assert_eq!(v.len(), 2);
-//        assert_eq!(v.pop(), Some(1));
-//        assert_eq!(v.pop(), Some(1));
-//        assert_eq!(v.pop(), None);
-//
-//        assert_eq!(v.iter().count(), 0);
-//        v.push(1);
-//        assert_eq!(v.iter().count(), 1);
-//        v.push(1);
-//        assert_eq!(v.iter().count(), 2);
-//
-//        for &() in &v {}
-//
-//        assert_eq!(v.iter_mut().count(), 2);
-//        v.push(1);
-//        assert_eq!(v.iter_mut().count(), 3);
-//        v.push(1);
-//        assert_eq!(v.iter_mut().count(), 4);
-//
-//        for &mut () in &mut v {}
-//        unsafe {
-//            v.set_len(0);
-//        }
-//        assert_eq!(v.iter_mut().count(), 0);
-//    }
+    fn zero_sized_values() {
+        let mut v = Self::new();
+        assert_eq!(v.len(), 0);
+        v.push(1);
+        assert_eq!(v.len(), 1);
+        v.push(1);
+        assert_eq!(v.len(), 2);
+        assert_eq!(v.pop(), Some(1));
+        assert_eq!(v.pop(), Some(1));
+        assert_eq!(v.pop(), None);
+
+        assert_eq!(v.iter().count(), 0);
+        v.push(1);
+        assert_eq!(v.iter().count(), 1);
+        v.push(1);
+        assert_eq!(v.iter().count(), 2);
+
+        for &_ in v.iter() {}
+
+        assert_eq!(v.iter_mut().count(), 2);
+        v.push(1);
+        assert_eq!(v.iter_mut().count(), 3);
+        v.push(1);
+        assert_eq!(v.iter_mut().count(), 4);
+
+        for &mut _ in &mut v.iter_mut() {}
+        v.truncate(0);
+        assert_eq!(v.iter_mut().count(), 0);
+    }
 }
 
 #[trait_tests]
-impl ListTests for Vec<isize>{}
+impl ListTests for Vec<isize>{ fn new() -> Self { Vec::new() } }
 
-impl ListTests for LinkedList<isize>{}
+//impl ListTests for LinkedList<isize>{}
