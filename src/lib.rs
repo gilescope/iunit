@@ -15,4 +15,6 @@
 #![feature(plugin)]
 #![plugin(trait_tests)]
 
+extern crate core;
+
 pub mod stdx;

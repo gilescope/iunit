@@ -7,7 +7,7 @@ extern crate iunit;
 #[cfg(test)]
 mod impl_tests {
     use iunit::stdx::collections::Set;
-    use iunit::stdx::collections::tests::{SetTestsisize, SetTestsfoo, SetTestschar, Foo};
+    //use iunit::stdx::collections::tests::{SetTestsisize, SetTestsfoo, SetTestschar, Foo};
     use std::hash::Hash;
 
     //MySet example of minimal implementation to run the tests.
@@ -95,7 +95,7 @@ mod impl_tests {
         }
     }
 
-    #[trait_tests] impl SetTestsisize for MySet<isize> {}
-    #[trait_tests] impl SetTestsfoo for MySet<Foo> {}
-    #[trait_tests] impl SetTestschar for MySet<char> {}
+//    #[trait_tests] impl SetTestsisize for MySet<isize> {}
+//    #[trait_tests] impl SetTestsfoo for MySet<Foo> {}
+//    #[trait_tests] impl SetTestschar for MySet<char> {}
 }
