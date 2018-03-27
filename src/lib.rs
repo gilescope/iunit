@@ -15,7 +15,6 @@
 #![feature(plugin)]
 #![plugin(trait_tests)]
 
-extern crate core;
 extern crate eclectic;
 
 pub mod stdx;

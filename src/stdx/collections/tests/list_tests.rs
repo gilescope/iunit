@@ -111,4 +111,8 @@ pub trait ListTests: List<Item=isize>
 #[trait_tests]
 impl ListTests for Vec<isize>{ fn new() -> Self { Vec::new() } }
 
+//TODO: Compiler error:
+//#[trait_tests]
+//impl ListTests for &[isize] { fn new() -> Self { Vec::new() } }
+
 //impl ListTests for LinkedList<isize>{}

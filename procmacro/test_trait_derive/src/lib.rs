@@ -5,7 +5,8 @@ extern crate syntax;
 extern crate rustc_plugin;
 
 use syntax::abi::Abi;
-use syntax::ast::{self, Ident, Generics, Item, TraitRef,Path, WhereClause, PathParameters, Ty, AngleBracketedParameterData,
+use syntax::ast::{self, Ident, Generics, Item, TraitItemKind, TraitRef, TraitItem, Path,
+                  WhereClause, PathParameters, Ty, AngleBracketedParameterData,
                   PathSegment, ExprKind,Expr, ItemKind, StmtKind, Stmt, TyKind, MethodSig,
                   Unsafety, Constness, FunctionRetTy, FnDecl };
 use syntax::codemap::{ self, Spanned};
@@ -35,6 +36,8 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
         match item.node {
             ItemKind::Impl(_, _, _, _, Some(TraitRef { path: ref trait_ref, ref_id:_} ),
                             ref impl_type, _) => {
+                // ![trait_tests] has been put on an implementation,
+                // we need to generate a test that calls the test_all() function defined on the trait.
                 //We look like: impl SetTestsisize for MySet<isize> {}
 
                 let s : String = format!("{:?}",impl_type);
@@ -101,33 +104,49 @@ fn expand_meta_trait_test(cx: &mut ExtCtxt,
 
                 return  vec![Annotatable::Item(P(Item{attrs: Vec::new(), ..(*item).clone() })), test_fn];
             },
-            ItemKind::Trait(a, b, ref c, ref d,  ref trait_items) => {
+            ItemKind::Trait(a, b, ref c, ref d, ref trait_items) => {
+                // ![trait_tests] has been put on a trait, we need to generate a test_all() function.
                 let mut test_names = vec![];
 
-                for meth in trait_items {
-                    let fn_call = Stmt {
-                        id: ast::DUMMY_NODE_ID,
-                        node: StmtKind::Semi(P(Expr {
-                            id: ast::DUMMY_NODE_ID,
-                            node: ExprKind::Call(P(Expr {
-                                span,
-                                attrs: ThinVec::new(),
-                                id: ast::DUMMY_NODE_ID,
-                                node:
-                                ExprKind::Path(None, ::syntax::ast::Path {
-                                    span,
-                                    segments: vec![
-                                        PathSegment { span, parameters: None, identifier: Ident::from_str("Self") },
-                                        PathSegment { span, parameters: None, identifier: meth.ident.clone() },
-                                    ]
-                                })
-                            }), vec![]),
-                            span,
-                            attrs: ThinVec::new()
-                        })),
-                        span,
-                    };
-                    test_names.push(fn_call);
+                for method in trait_items {
+                    match method {
+                        &TraitItem {
+                            generics:Generics{ params: ref v, ..},
+                            node:TraitItemKind::Method(
+                                MethodSig{ decl: ref fn_decl, .. }, Some(_)),
+                            ..
+                        } if v.is_empty() => {
+                            match **fn_decl {
+                                FnDecl{inputs: ref args, ..} if args.is_empty() => {
+                                    let fn_call = Stmt {
+                                        id: ast::DUMMY_NODE_ID,
+                                        node: StmtKind::Semi(P(Expr {
+                                            id: ast::DUMMY_NODE_ID,
+                                            node: ExprKind::Call(P(Expr {
+                                                span,
+                                                attrs: ThinVec::new(),
+                                                id: ast::DUMMY_NODE_ID,
+                                                node:
+                                                ExprKind::Path(None, ::syntax::ast::Path {
+                                                    span,
+                                                    segments: vec![
+                                                        PathSegment { span, parameters: None, identifier: Ident::from_str("Self") },
+                                                        PathSegment { span, parameters: None, identifier: method.ident.clone() },
+                                                    ]
+                                                })
+                                            }), vec![]),
+                                            span,
+                                            attrs: ThinVec::new()
+                                        })),
+                                        span,
+                                    };
+                                    test_names.push(fn_call);
+                                },
+                                _ => {}
+                            }
+                        },
+                        _ => {}
+                    }
                 }
 
                 let body = cx.block(span, test_names);
