@@ -6,4 +6,4 @@ authors = ["Giles Cope <gilescope@gmail.com>"]
 [dependencies]
 eclectic = "0.11"
 # Shame this isn't a dev-dependency. You would think a compiler plugin could be just that.
-trait_tests = { path="procmacro/test_trait_derive"}
+trait_tests ="*"
