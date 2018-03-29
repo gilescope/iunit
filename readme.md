@@ -13,6 +13,14 @@ and gradually an ecosystem of people publishing std tests with their interfaces.
 
 Warning: This is a proof of concept.
 
+# Free Tests
+
+iunit comprises of the following free tests just for you:
+
+   * List: 1 tests.
+   * Set: 7 tests.
+   * PriorityQueue: 10 tests.
+
 ## How: Defining a test on a Trait
 
 To create a trait test, create a subtrait of the trait under test with static functions on it. The generic parameters should be concreted out into a type of your choosing to help you with the testing.

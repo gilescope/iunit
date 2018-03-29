@@ -44,17 +44,16 @@ pub trait SetTestsisize: Set<Item=isize>
 + Eq
 + Sized
 + AddRemove
++ Default
 {
-    fn new() -> Self;
-
     // This is sub-optimal but currently #[test] excludes all generics.is_parameterized()
     // despite their being no unfilled parameters. (src/libsyntax/test.rs)
     // We are autogenerating a test_all() function using a compiler plugin: #[trait_tests]
 
     fn test_disjoint()
     {
-        let mut xs = Self::new();
-        let mut ys = Self::new();
+        let mut xs = Self::default();
+        let mut ys = Self::default();
 
         assert!(xs.is_disjoint(&ys));
         assert!(ys.is_disjoint(&xs));
@@ -76,13 +75,13 @@ pub trait SetTestsisize: Set<Item=isize>
 
     fn test_subset_and_superset()
     {
-        let mut a = Self::new();
+        let mut a = Self::default();
         assert!(a.insert(0));
         assert!(a.insert(5));
         assert!(a.insert(11));
         assert!(a.insert(7));
 
-        let mut b = Self::new();
+        let mut b = Self::default();
         assert!(b.insert(0));
         assert!(b.insert(7));
         assert!(b.insert(19));
@@ -105,7 +104,7 @@ pub trait SetTestsisize: Set<Item=isize>
 
     fn test_iterate()
     {
-        let mut a = Self::new();
+        let mut a = Self::default();
         for i in 0..32 {
             assert!(a.insert(i));
         }
@@ -240,13 +239,13 @@ pub trait SetTestsisize: Set<Item=isize>
     {
         // These constants once happened to expose a bug in insert().
         // I'm keeping them around to prevent a regression.
-        let mut s1 = Self::new();
+        let mut s1 = Self::default();
 
         s1.insert(1);
         s1.insert(2);
         s1.insert(3);
 
-        let mut s2 = Self::new();
+        let mut s2 = Self::default();
 
         s2.insert(1);
         s2.insert(2);
@@ -260,8 +259,8 @@ pub trait SetTestsisize: Set<Item=isize>
 
     fn test_show()
     {
-        let mut set = Self::new();
-        let empty = Self::new();
+        let mut set = Self::default();
+        let empty = Self::default();
 
         set.insert(1);
         set.insert(2);
@@ -302,13 +301,11 @@ pub trait SetTestsisize: Set<Item=isize>
 }
 
 #[trait_tests]
-pub trait SetTestsfoo: Set<Item=Foo> + Sized + IntoIterator<Item=Foo> + AddRemove
+pub trait SetTestsfoo: Set<Item=Foo> + Sized + IntoIterator<Item=Foo> + AddRemove + Default
 {
-    fn new() -> Self;
-
     fn test_replace()
     {
-        let mut s = Self::new();
+        let mut s = Self::default();
         assert_eq!(s.replace(Foo("a", 1)), None);
         assert_eq!(s.len(), 1);
         assert_eq!(s.replace(Foo("a", 2)), Some(Foo("a", 1)));
@@ -321,15 +318,13 @@ pub trait SetTestsfoo: Set<Item=Foo> + Sized + IntoIterator<Item=Foo> + AddRemov
 }
 
 #[trait_tests]
-pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRemove
+pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRemove + Default
 {
-    fn new() -> Self;
-
     //#[test]
     fn test_move_iter()
     {
         let hs = {
-            let mut hs = Self::new();
+            let mut hs = Self::default();
 
             hs.insert('a');
             hs.insert('b');
@@ -343,11 +338,11 @@ pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRe
 }
 
 //Have to either be here or in the std crate:
-#[trait_tests] impl SetTestsisize for HashSet<isize> { fn new() -> HashSet<isize> { HashSet::new() }}
-#[trait_tests] impl SetTestsfoo for HashSet<Foo> { fn new() -> HashSet<Foo> { HashSet::new() }}
-#[trait_tests] impl SetTestschar for HashSet<char> { fn new() -> HashSet<char> { HashSet::new() }}
+#[trait_tests] impl SetTestsisize for HashSet<isize> { }
+#[trait_tests] impl SetTestsfoo for HashSet<Foo> {  }
+#[trait_tests] impl SetTestschar for HashSet<char> { }
 
 //Have to either be here or in the std crate:
-#[trait_tests] impl SetTestsisize for BTreeSet<isize> { fn new() -> BTreeSet<isize> { BTreeSet::new() }}
-#[trait_tests] impl SetTestsfoo for BTreeSet<Foo> { fn new() -> BTreeSet<Foo> { BTreeSet::new() }}
-#[trait_tests] impl SetTestschar for BTreeSet<char> { fn new() -> BTreeSet<char> { BTreeSet::new() }}
+#[trait_tests] impl SetTestsisize for BTreeSet<isize> { }
+#[trait_tests] impl SetTestsfoo for BTreeSet<Foo> { }
+#[trait_tests] impl SetTestschar for BTreeSet<char> { }

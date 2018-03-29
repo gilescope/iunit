@@ -13,8 +13,13 @@
 //!
 #![feature(custom_attribute)]
 #![feature(plugin)]
+
+#![feature(box_syntax)]
+#![feature(placement_in_syntax)]
+
 #![plugin(trait_tests)]
 
 extern crate eclectic;
+extern crate rand;
 
 pub mod stdx;
