@@ -3,8 +3,11 @@ name = "iunit"
 version = "0.1.0"
 authors = ["Giles Cope <gilescope@gmail.com>"]
 
+[lib]
+doctest = false
+
 [dependencies]
 eclectic = "0.11"
 # Shame this isn't a dev-dependency. You would think a compiler plugin could be just that.
-trait_tests ="*"
+trait_tests ="0.1.2"
 rand="*"

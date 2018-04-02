@@ -17,9 +17,16 @@
 #![feature(box_syntax)]
 #![feature(placement_in_syntax)]
 
+#![feature(alloc_system)] //alloc tests
+#![feature(allocator_api)]
+
 #![plugin(trait_tests)]
 
 extern crate eclectic;
+//priority panic tests
 extern crate rand;
+
+//alloc tests
+extern crate alloc_system;
 
 pub mod stdx;
