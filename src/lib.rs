@@ -32,4 +32,6 @@ extern crate test;
 //alloc tests
 extern crate alloc_system;
 
+extern crate num;
+
 pub mod stdx;
