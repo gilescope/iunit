@@ -17,9 +17,11 @@ Warning: This is a proof of concept.
 
 iunit comprises of the following free tests just for you:
 
-   * List: 1 tests.
+   * List: 6 tests.
    * Set: 7 tests.
    * PriorityQueue: 10 tests.
+   
+   * Alloc: 1 test.
 
 ## How: Defining a test on a Trait
 

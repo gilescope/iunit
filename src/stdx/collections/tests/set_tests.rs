@@ -2,6 +2,7 @@ use std::fmt::Debug;
 //use std::iter::FromIterator;
 use std::hash as hash;
 use std::collections::{HashSet, BTreeSet};
+use super::CollectionTests;
 
 use eclectic::{Set, AddRemove};
 
@@ -37,7 +38,7 @@ impl hash::Hash for Foo {
 //TODO no drain or retain on BTreeSet. Leave out those tests for now.
 
 #[trait_tests]
-pub trait SetTestsisize: Set<Item=isize>
+pub trait SetTestsisize: Set<Item=isize> + CollectionTests
 //+ FromIterator<isize>
 //+ IntoIterator<Item=isize>
 + Debug
@@ -49,6 +50,10 @@ pub trait SetTestsisize: Set<Item=isize>
     // This is sub-optimal but currently #[test] excludes all generics.is_parameterized()
     // despite their being no unfilled parameters. (src/libsyntax/test.rs)
     // We are autogenerating a test_all() function using a compiler plugin: #[trait_tests]
+
+//    fn test_super() {
+//        CollectionTests::test_all();
+//    }
 
     fn test_disjoint()
     {
@@ -339,10 +344,15 @@ pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRe
 
 //Have to either be here or in the std crate:
 #[trait_tests] impl SetTestsisize for HashSet<isize> { }
+#[trait_tests] impl CollectionTests for HashSet<isize> { fn new() -> Self { Self::new() } }
+
 #[trait_tests] impl SetTestsfoo for HashSet<Foo> {  }
 #[trait_tests] impl SetTestschar for HashSet<char> { }
 
 //Have to either be here or in the std crate:
 #[trait_tests] impl SetTestsisize for BTreeSet<isize> { }
+#[trait_tests] impl CollectionTests for BTreeSet<isize> { fn new() -> Self { Self::new() }}
+
+
 #[trait_tests] impl SetTestsfoo for BTreeSet<Foo> { }
 #[trait_tests] impl SetTestschar for BTreeSet<char> { }
