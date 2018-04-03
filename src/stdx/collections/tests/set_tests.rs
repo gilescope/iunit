@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use std::hash as hash;
 use std::collections::{HashSet, BTreeSet};
 use super::CollectionTests;
+use super::super::super::core::CloneTests;
 
 use eclectic::{Set, AddRemove};
 
@@ -349,6 +350,8 @@ pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRe
 #[trait_tests] impl SetTestsfoo for HashSet<Foo> {  }
 #[trait_tests] impl SetTestschar for HashSet<char> { }
 
+#[trait_tests] impl CloneTests for HashSet<char> { fn new() -> Self { Self::new() } }
+
 //Have to either be here or in the std crate:
 #[trait_tests] impl SetTestsisize for BTreeSet<isize> { }
 #[trait_tests] impl CollectionTests for BTreeSet<isize> { fn new() -> Self { Self::new() }}
@@ -356,3 +359,7 @@ pub trait SetTestschar: Set<Item=char> + Sized + IntoIterator<Item=char> + AddRe
 
 #[trait_tests] impl SetTestsfoo for BTreeSet<Foo> { }
 #[trait_tests] impl SetTestschar for BTreeSet<char> { }
+
+
+#[trait_tests]
+impl CloneTests for BTreeSet<char> { fn new() -> Self { Self::new() } }

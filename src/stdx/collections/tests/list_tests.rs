@@ -705,6 +705,10 @@ impl ListTests for Vec<isize>{ fn new() -> Self { Vec::new() } }
 #[trait_tests]
 impl ListTestsBoxed for Vec<Box<isize>>{ fn new() -> Self { Vec::new() } }
 
+//#[trait_tests]
+//impl ListTests for String{ fn new() -> Self { String::new() } }
+
+
 //TODO: Compiler error:
 //#[trait_tests]
 //impl ListTests for &[isize] { fn new() -> Self { Vec::new() } }

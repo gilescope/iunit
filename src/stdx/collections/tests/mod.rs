@@ -11,7 +11,7 @@ pub use self::queue_tests::*;
 use eclectic::Collection;
 
 #[trait_tests]
-trait CollectionTests : Collection + Sized {
+pub trait CollectionTests : Collection + Sized {
     fn new() -> Self;
 
     fn test_new_length() {

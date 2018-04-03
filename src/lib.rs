@@ -17,6 +17,8 @@
 #![feature(box_syntax)]
 #![feature(placement_in_syntax)]
 
+#![feature(test)]//for benches
+
 #![feature(alloc_system)] //alloc tests
 #![feature(allocator_api)]
 
@@ -25,6 +27,7 @@
 extern crate eclectic;
 //priority panic tests
 extern crate rand;
+extern crate test;
 
 //alloc tests
 extern crate alloc_system;
