@@ -1,5 +1,6 @@
 # Trait Tests
 
+[![Travis](https://travis-ci.org/gilescope/iunit.svg?branch=master)](https://travis-ci.org/gilescope/iunit)
 ## Why
 
 More tests are great, but less code is less bugs so we want more tests but less code. This crate attempts to break the N*M problem of repeatedly writing tests for all the individual implementations. 
