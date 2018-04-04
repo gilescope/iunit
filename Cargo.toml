@@ -7,8 +7,15 @@ authors = ["Giles Cope <gilescope@gmail.com>"]
 doctest = false
 
 [dependencies]
-eclectic = "0.11"
-# Shame this isn't a dev-dependency. You would think a compiler plugin could be just that.
-trait_tests ="0.1.2"
-rand="*"
-num = "*"
+# Shame this isn't a build-dependency. You would think a compiler plugin could be just that.
+trait_tests="0.1.2"
+
+#rand="*"
+eclectic = {version="0.11", optional=true}
+num = { version="*", optional=true }
+num-traits= { version="*", optional=true }
+
+[features]
+default = [ "num_tests", "eclectic_tests" ]
+num_tests = ["num", "num-traits"]
+eclectic_tests = ["eclectic"]

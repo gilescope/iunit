@@ -94,10 +94,19 @@ pub trait DebugTests : Debug + Sized {
 }
 
 
-#[trait_tests] impl CloneTests for String { fn new() -> Self { Self::new() } }
+#[cfg(test)]
+mod test {
+    use super::*;
 
-#[trait_tests] impl EqTests for String { fn new() -> Self { Self::new() } }
+    #[trait_tests]
+    impl CloneTests for String { fn new() -> Self { Self::new() } }
 
-#[trait_tests] impl DebugTests for String { fn new() -> Self { Self::new() } }
+    #[trait_tests]
+    impl EqTests for String { fn new() -> Self { Self::new() } }
 
-#[trait_tests] impl PartialOrdTests for String { fn new() -> Self { String::new() } }
+    #[trait_tests]
+    impl DebugTests for String { fn new() -> Self { Self::new() } }
+
+    #[trait_tests]
+    impl PartialOrdTests for String { fn new() -> Self { String::new() } }
+}

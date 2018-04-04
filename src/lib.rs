@@ -24,14 +24,20 @@
 
 #![plugin(trait_tests)]
 
+#[cfg(feature="eclectic_tests")]
 extern crate eclectic;
 //priority panic tests
-extern crate rand;
-extern crate test;
+
+//extern crate rand;
+//bench:
+//extern crate test;
 
 //alloc tests
 extern crate alloc_system;
 
+#[cfg(feature="num_tests")]
 extern crate num;
+#[cfg(feature="num_tests")]
+extern crate num_traits;
 
 pub mod stdx;

@@ -8,8 +8,7 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use alloc_system::System;
-use std::heap::{Heap, Alloc, Layout};
+use std::heap::{Alloc, Layout};
 
 /// https://github.com/rust-lang/rust/issues/45955
 ///
@@ -41,12 +40,20 @@ trait AllocTests : Alloc + Sized {
     }
 }
 
-#[trait_tests]
-impl AllocTests for System {
-    fn new() -> Self { System }
-}
 
-#[trait_tests]
-impl AllocTests for Heap {
-    fn new() -> Self { Heap }
+#[cfg(test)]
+mod test {
+    use super::*;
+    use alloc_system::System;
+    use std::heap::Heap;
+
+    #[trait_tests]
+    impl AllocTests for System {
+        fn new() -> Self { System }
+    }
+
+    #[trait_tests]
+    impl AllocTests for Heap {
+        fn new() -> Self { Heap }
+    }
 }
