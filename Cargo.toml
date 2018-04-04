@@ -14,11 +14,18 @@ trait_tests="0.1.2"
 eclectic = {version="0.11", optional=true}
 num = { version="*", optional=true }
 num-traits= { version="*", optional=true }
+num-complex={ version="*", optional=true }
+num-bigint={ version="*", optional=true }
+num-integer={ version="*", optional=true }
+num-rational={ version="*", optional=true }
 
 [badges]
 travis-ci = { repository = "gilescope/iunit", branch = "master" }
 
 [features]
-default = [ "num_tests", "eclectic_tests" ]
-num_tests = ["num", "num-traits"]
+default = [ "num_selftest", "eclectic_tests" ]
+
+num_tests = ["num-traits"]
+num_selftest = ["num_tests", "num", "num-complex", "num-bigint", "num-integer", "num-rational"]
+
 eclectic_tests = ["eclectic"]

@@ -40,4 +40,13 @@ extern crate num;
 #[cfg(feature="num_tests")]
 extern crate num_traits;
 
+#[cfg(all(feature="num_tests", test))]
+extern crate num_complex;
+#[cfg(all(feature="num_tests", test))]
+extern crate num_bigint;
+#[cfg(all(feature="num_tests", test))]
+extern crate num_integer;
+#[cfg(all(feature="num_tests", test))]
+extern crate num_rational;
+
 pub mod stdx;

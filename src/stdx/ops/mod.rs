@@ -1,9 +1,8 @@
 use std::fmt::Debug;
-use num::{Num};
-use num_traits::{NumRef, NumAssign, NumAssignOps};
+use num_traits::{Num, NumRef}; //NumAssign, NumAssignOps
 
 #[trait_tests]
-pub trait NumTests : Num + Copy + Debug + NumAssignOps + NumRef
+pub trait NumTests : Num + Clone + Debug + NumRef //+ NumAssignOps
 {
     fn test_add_sub_zero() {
         assert_eq!((Self::zero() + Self::zero()) - Self::zero(), Self::zero());
@@ -34,12 +33,15 @@ pub trait NumTests : Num + Copy + Debug + NumAssignOps + NumRef
 
     //From num-traits/blob/master/src/lib.rs
     fn check_num_ops() {
-        fn compute<T: Num + Copy>(x: T, y: T) -> T {
-            x * y / y % y + y - y
+        fn compute<T: Num + Clone>(x: T, y: T) -> T {
+            let y1 = y.clone();
+            let y2 = y.clone();
+            let y3 = y.clone();
+            let y4 = y.clone();
+            x * y / y1 % y2 + y3 - y4
         }
         assert_eq!(compute(Self::one(), Self::one() + Self::one()), Self::one())
     }
-
 
     fn check_numref_ops() {
         fn compute<T: NumRef>(x: T, y: &T) -> T {
@@ -68,22 +70,26 @@ pub trait NumTests : Num + Copy + Debug + NumAssignOps + NumRef
 //    // TODO test `NumAssignRef`, but even the standard numeric types don't
 //    // implement this yet. (see rust pr41336)
 
-    fn check_numassign_ops() {
-        fn compute<T: NumAssign + Copy>(mut x: T, y: T) -> T {
-            x *= y;
-            x /= y;
-            x %= y;
-            x += y;
-            x -= y;
-            x
-        }
-        assert_eq!(compute(Self::one(), Self::one() + Self::one()), Self::one())
-    }
+//    fn check_numassign_ops() {
+//        fn compute<T: NumAssign + Copy>(mut x: T, y: T) -> T {
+//            x *= y;
+//            x /= y;
+//            x %= y;
+//            x += y;
+//            x -= y;
+//            x
+//        }
+//        assert_eq!(compute(Self::one(), Self::one() + Self::one()), Self::one())
+//    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use num_complex::Complex;
+    use num_bigint::BigInt;
+    use num_rational::BigRational;
+
     #[trait_tests] impl NumTests for usize { }
     #[trait_tests] impl NumTests for u8 { }
     #[trait_tests] impl NumTests for u16 { }
@@ -95,4 +101,11 @@ mod test {
     #[trait_tests] impl NumTests for i16 { }
     #[trait_tests] impl NumTests for i32 { }
     #[trait_tests] impl NumTests for i64 { }
+
+    #[trait_tests] impl NumTests for Complex<f64> { }
+    //TODO need to make trait_tests smarter...
+    //#[trait_tests] impl NumTests for Complex<i32> { }
+
+    #[trait_tests] impl NumTests for BigInt { }
+    #[trait_tests] impl NumTests for BigRational { }
 }

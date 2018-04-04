@@ -16,13 +16,25 @@ Warning: This is a proof of concept.
 
 # Free Tests
 
-iunit comprises of the following free tests just for you:
+iunit comprises of the following free tests, just for you:
+
+By default iunit includes standard library trait tests for:
+
+   * Alloc: 1 test.
+   * Clone: 2 tests.
+   * Eq: 1 test.
+   * PartialOrd: 1 test.
+   * Debug: 1 test.
+
+Collections are covered via the eclectic crate (eclectic_tests feature):
 
    * List: 6 tests.
    * Set: 7 tests.
    * PriorityQueue: 10 tests.
    
-   * Alloc: 1 test.
+Numbers use the num-traits in the num crate (num_tests feature):
+   * Num: 8 tests.
+
 
 ## How: Defining a test on a Trait
 
