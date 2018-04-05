@@ -3,6 +3,9 @@ use std::fmt::Debug;
 
 use eclectic::{List, AddRemove, Mutate};
 
+use proptest::prelude::*;
+use proptest::test_runner::{TestRunner, FailurePersistence, Config};
+
 //pub struct DropCounter<'a> {
 //    count: &'a mut u32,
 //}
@@ -389,9 +392,9 @@ pub trait ListTests: List<Item=isize>
         m.push_back(1);
         assert!(n == m);
 
-        let n = Self::list_from(&[2, 3, 4]);
+        let n = Self::list_from(&[3, 2, 1]);
         let m = Self::list_from(&[1, 2, 3]);
-        assert!(n != m);
+        assert_ne!(n, m);
     }
 //
 //    //TODO maybe move to one with hash constraint
@@ -689,15 +692,24 @@ pub trait ListTests: List<Item=isize>
 //        }
 //    }
 
+    //Example trait prop_test test:
+    fn test_length() {
+        let mut runner = TestRunner::new(Config {
+            // Turn failure persistence off for demonstration
+            failure_persistence: FailurePersistence::Off,
+            .. Config::default()
+        });
 
-
-
-
-
-
-
-
-
+        runner.run(&prop::collection::vec(1..1000isize, 1..10000), | inputs | {
+            let mut me = Self::new();
+            let input_len = inputs.len();
+            for i in inputs.clone() {
+                me.push(i);
+            }
+            assert_eq!(input_len, me.len());
+            Ok(())
+        }).unwrap();
+    }
 }
 
 #[trait_tests]

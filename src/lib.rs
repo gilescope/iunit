@@ -35,8 +35,8 @@ extern crate eclectic;
 //alloc tests
 extern crate alloc_system;
 
-#[cfg(feature="num_tests")]
-extern crate num;
+#[macro_use] extern crate proptest;
+
 #[cfg(feature="num_tests")]
 extern crate num_traits;
 
@@ -48,5 +48,12 @@ extern crate num_bigint;
 extern crate num_integer;
 #[cfg(all(feature="num_tests", test))]
 extern crate num_rational;
+
+
+#[cfg(feature="dimensioned")]
+extern crate dimensioned;
+
+#[cfg(feature="dimensioned")]
+pub mod dimensioned_tests;
 
 pub mod stdx;

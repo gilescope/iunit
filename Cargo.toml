@@ -6,9 +6,12 @@ authors = ["Giles Cope <gilescope@gmail.com>"]
 [lib]
 doctest = false
 
+
+
 [dependencies]
 # Shame this isn't a build-dependency. You would think a compiler plugin could be just that.
 trait_tests="0.1.2"
+proptest = "0.5.1"
 
 #rand="*"
 eclectic = {version="0.11", optional=true}
@@ -18,14 +21,17 @@ num-complex={ version="*", optional=true }
 num-bigint={ version="*", optional=true }
 num-integer={ version="*", optional=true }
 num-rational={ version="*", optional=true }
+dimensioned={version="*", optional=true}
 
 [badges]
 travis-ci = { repository = "gilescope/iunit", branch = "master" }
 
 [features]
-default = [ "num_selftest", "eclectic_tests" ]
+default = [ "num_selftest", "eclectic_tests", "dimensioned_tests" ]
 
 num_tests = ["num-traits"]
 num_selftest = ["num_tests", "num", "num-complex", "num-bigint", "num-integer", "num-rational"]
 
 eclectic_tests = ["eclectic"]
+
+dimensioned_tests = ["dimensioned"]

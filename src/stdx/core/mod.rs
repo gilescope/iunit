@@ -1,5 +1,24 @@
 use std::fmt::Debug;
 
+#[trait_tests]
+pub trait CopyTests: Copy
+{
+    fn new() -> Self;
+
+    fn test_clone() {
+        let me = Self::new();
+        let me2 = me; //Copy occurs here.
+
+        assert!(!Self::is_same_address(&me, &me2));
+    }
+
+    fn is_same_address(left: &Self, right: &Self) -> bool {
+        let a = left as *const _ as *const ();
+        let b = right as *const _ as *const ();
+        a == b
+    }
+}
+
 
 #[trait_tests]
 pub trait CloneTests: Clone
@@ -12,10 +31,10 @@ pub trait CloneTests: Clone
         let other1 = me.clone();
         let other2 = me.clone();
 
-        assert!(Self::is_same(&me, &me));
-        assert!(!Self::is_same(&me, &other1));
-        assert!(!Self::is_same(&me, &other2));
-        assert!(!Self::is_same(&other1, &other2));
+        assert!(Self::is_same_address(&me, &me));
+        assert!(!Self::is_same_address(&me, &other1));
+        assert!(!Self::is_same_address(&me, &other2));
+        assert!(!Self::is_same_address(&other1, &other2));
     }
 
     fn test_clone_a_clone() {
@@ -24,13 +43,13 @@ pub trait CloneTests: Clone
         let clone1 = me.clone();
         let clone2 = clone1.clone();
 
-        assert!(Self::is_same(&me, &me));
-        assert!(!Self::is_same(&me, &clone1));
-        assert!(!Self::is_same(&me, &clone2));
-        assert!(!Self::is_same(&clone1, &clone2));
+        assert!(Self::is_same_address(&me, &me));
+        assert!(!Self::is_same_address(&me, &clone1));
+        assert!(!Self::is_same_address(&me, &clone2));
+        assert!(!Self::is_same_address(&clone1, &clone2));
     }
 
-    fn is_same(left: &Self, right: &Self) -> bool {
+    fn is_same_address(left: &Self, right: &Self) -> bool {
         let a = left as *const _ as *const ();
         let b = right as *const _ as *const ();
         a == b
@@ -93,6 +112,7 @@ pub trait DebugTests : Debug + Sized {
     }
 }
 
+//TODO Error trait, Hash trait
 
 #[cfg(test)]
 mod test {
@@ -109,4 +129,8 @@ mod test {
 
     #[trait_tests]
     impl PartialOrdTests for String { fn new() -> Self { String::new() } }
+
+    #[trait_tests]
+    impl CopyTests for i32 { fn new() -> Self { 10 } }
+
 }
