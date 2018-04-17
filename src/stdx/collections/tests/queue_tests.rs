@@ -1,6 +1,7 @@
 use std::collections::BinaryHeap;
 use eclectic::{PrioQueue, AddRemove};
 
+use trait_tests::trait_tests;
 //use std::cmp;
 //use std::collections::binary_heap::{Drain, PeekMut};
 
@@ -91,15 +92,19 @@ use eclectic::{PrioQueue, AddRemove};
 //    }
 //}
 
+
+
+
 #[trait_tests]
 trait PriorityQueueTests :
-    PrioQueue<Item=isize> + AddRemove + Sized + Clone +
+    PrioQueue<Item=isize> + AddRemove +
+    Sized + Clone + Default +
     ::std::iter::FromIterator<isize>
 {
-    fn new() -> Self;
+    fn test_all1() {}
 
     fn from(vec: Vec<isize>) -> Self {
-        let pq: Self = vec.iter().cloned().collect();
+        let pq  : Self = vec.iter().cloned().collect();
         pq
     }
 
@@ -288,13 +293,13 @@ trait PriorityQueueTests :
 
 
     fn test_empty_pop() {
-        let mut heap = Self::new();
+        let mut heap = Self::default();
         assert!(heap.pop().is_none());
     }
 
 
     fn test_empty_peek() {
-        let empty = Self::new();
+        let empty = Self::default();
         assert!(empty.peek().is_none());
     }
 
@@ -362,7 +367,7 @@ trait PriorityQueueTests :
 
 
     fn test_append_to_empty() {
-        let mut a = Self::new();
+        let mut a = Self::default();
         let mut b = Self::from(vec![-20, 5, 43]);
 
         a.append(&mut b);
@@ -419,8 +424,9 @@ trait PriorityQueueTests :
 
 }
 
-#[trait_tests]
-impl PriorityQueueTests for BinaryHeap<isize> { fn new() -> Self { BinaryHeap::new() } }
+//Can't use #[trait_tests] here as we don't define BinaryHeap struct in this crate.
+impl PriorityQueueTests for BinaryHeap<isize> {}
+#[test] fn test_binary_heap_isize() { <BinaryHeap<isize> as PriorityQueueTests>::test_all() }
 
 //TODO: panic tests seem to panic...
 //#[trait_tests]

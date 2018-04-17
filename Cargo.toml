@@ -6,11 +6,9 @@ authors = ["Giles Cope <gilescope@gmail.com>"]
 [lib]
 doctest = false
 
-
-
 [dependencies]
 # Shame this isn't a build-dependency. You would think a compiler plugin could be just that.
-trait_tests="0.1.2"
+trait_tests={version="0.2", path="../trait_tests"}
 proptest = "0.5.1"
 
 #rand="*"

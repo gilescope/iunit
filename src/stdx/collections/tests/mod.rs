@@ -1,3 +1,5 @@
+#![feature(proc_macro)]
+
 mod set_tests;
 mod list_tests;
 mod queue_tests;
@@ -10,11 +12,11 @@ pub use self::queue_tests::*;
 
 use eclectic::Collection;
 
-#[trait_tests]
-pub trait CollectionTests : Collection + Sized {
-    fn new() -> Self;
+use trait_tests::trait_tests;
 
-    fn test_new_length() {
-        assert_eq!(Self::new().len(), 0);
-    }
-}
+//#[trait_tests]
+//pub trait CollectionTests : Collection + Sized + Default {
+//    fn test_new_length() {
+//        assert_eq!(Self::default().len(), 0);
+//    }
+//}

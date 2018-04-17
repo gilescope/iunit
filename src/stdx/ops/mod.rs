@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use num_traits::{Num, NumRef}; //NumAssign, NumAssignOps
+use trait_tests::trait_tests;
 
 #[trait_tests]
 pub trait NumTests : Num + Clone + Debug + NumRef //+ NumAssignOps
@@ -90,22 +91,37 @@ mod test {
     use num_bigint::BigInt;
     use num_rational::BigRational;
 
-    #[trait_tests] impl NumTests for usize { }
-    #[trait_tests] impl NumTests for u8 { }
-    #[trait_tests] impl NumTests for u16 { }
-    #[trait_tests] impl NumTests for u32 { }
-    #[trait_tests] impl NumTests for u64 { }
+    //#[trait_tests] can't be used as usize is not defined in this crate.
+    impl NumTests for usize { }
+    #[test] fn test_numtests_usize() { <usize as NumTests>::test_all() }
 
-    #[trait_tests] impl NumTests for isize { }
-    #[trait_tests] impl NumTests for i8 { }
-    #[trait_tests] impl NumTests for i16 { }
-    #[trait_tests] impl NumTests for i32 { }
-    #[trait_tests] impl NumTests for i64 { }
+    impl NumTests for u8 { }
+    #[test] fn test_numtests_u8() { <usize as NumTests>::test_all() }
+    impl NumTests for u16 { }
+    #[test] fn test_numtests_u16() { <usize as NumTests>::test_all() }
+    impl NumTests for u32 { }
+    #[test] fn test_numtests_u32() { <usize as NumTests>::test_all() }
+    impl NumTests for u64 { }
+    #[test] fn test_numtests_u64() { <usize as NumTests>::test_all() }
 
-    #[trait_tests] impl NumTests for Complex<f64> { }
+    impl NumTests for isize { }
+    #[test] fn test_numtests_isize() { <usize as NumTests>::test_all() }
+    impl NumTests for i8 { }
+    #[test] fn test_numtests_i8() { <usize as NumTests>::test_all() }
+    impl NumTests for i16 { }
+    #[test] fn test_numtests_i16() { <usize as NumTests>::test_all() }
+    impl NumTests for i32 { }
+    #[test] fn test_numtests_i32() { <usize as NumTests>::test_all() }
+    impl NumTests for i64 { }
+    #[test] fn test_numtests_i64() { <usize as NumTests>::test_all() }
+
+    impl NumTests for Complex<f64> { }
+    #[test] fn test_numtests_complex_f64() { <usize as NumTests>::test_all() }
     //TODO need to make trait_tests smarter...
     //#[trait_tests] impl NumTests for Complex<i32> { }
 
-    #[trait_tests] impl NumTests for BigInt { }
-    #[trait_tests] impl NumTests for BigRational { }
+    impl NumTests for BigInt { }
+    #[test] fn test_numtests_bigint() { <usize as NumTests>::test_all() }
+    impl NumTests for BigRational { }
+    #[test] fn test_numtests_bigrational() { <usize as NumTests>::test_all() }
 }

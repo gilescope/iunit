@@ -1,12 +1,11 @@
 use std::fmt::Debug;
+use trait_tests::trait_tests;
 
 #[trait_tests]
-pub trait CopyTests: Copy
+pub trait CopyTests: Copy + Default
 {
-    fn new() -> Self;
-
     fn test_clone() {
-        let me = Self::new();
+        let me = Self::default();
         let me2 = me; //Copy occurs here.
 
         assert!(!Self::is_same_address(&me, &me2));
@@ -21,12 +20,10 @@ pub trait CopyTests: Copy
 
 
 #[trait_tests]
-pub trait CloneTests: Clone
+pub trait CloneTests: Clone + Default
 {
-    fn new() -> Self;
-
     fn test_clone() {
-        let me = Self::new();
+        let me = Self::default();
 
         let other1 = me.clone();
         let other2 = me.clone();
@@ -38,7 +35,7 @@ pub trait CloneTests: Clone
     }
 
     fn test_clone_a_clone() {
-        let me = Self::new();
+        let me = Self::default();
 
         let clone1 = me.clone();
         let clone2 = clone1.clone();
@@ -57,16 +54,14 @@ pub trait CloneTests: Clone
 }
 
 #[trait_tests]
-pub trait EqTests : Eq + Sized {
-    fn new() -> Self;
-
+pub trait EqTests : Eq + Sized + Default {
     fn test_eq() {
-        let me = &Self::new();
+        let me = &Self::default();
 
         //Assert Reflective
         assert!(me.eq(me));
 
-        let me_too = &Self::new();
+        let me_too = &Self::default();
 
         if me.eq(me_too) {
             //Assert symmetric
@@ -79,14 +74,12 @@ pub trait EqTests : Eq + Sized {
 }
 
 #[trait_tests]
-pub trait PartialOrdTests : PartialOrd + Sized {
-    fn new() -> Self;
-
+pub trait PartialOrdTests : PartialOrd + Sized + Default {
     fn test_partial_ord() {
-        let me = &Self::new();
+        let me = &Self::default();
         assert!(me.eq(me));
 
-        let me_too = &Self::new();
+        let me_too = &Self::default();
 
         me.ne(me_too);
         //We can't assert that this returns true or false,
@@ -100,11 +93,9 @@ pub trait PartialOrdTests : PartialOrd + Sized {
 }
 
 #[trait_tests]
-pub trait DebugTests : Debug + Sized {
-    fn new() -> Self;
-
+pub trait DebugTests : Debug + Sized + Default {
     fn test_new_debug() {
-        let me = Self::new();
+        let me = Self::default();
 
         format!("{:#?}", &me);
 
@@ -118,19 +109,20 @@ pub trait DebugTests : Debug + Sized {
 mod test {
     use super::*;
 
-    #[trait_tests]
-    impl CloneTests for String { fn new() -> Self { Self::new() } }
+    //#[trait_tests] can't be used as String struct not defined in this crate.
+    impl CloneTests for String {}
+    #[test] fn test_clonetests_string() { <String as CloneTests>::test_all() }
 
-    #[trait_tests]
-    impl EqTests for String { fn new() -> Self { Self::new() } }
+    impl EqTests for String {  }
+    #[test] fn test_eqtests_string() { <String as EqTests>::test_all() }
 
-    #[trait_tests]
-    impl DebugTests for String { fn new() -> Self { Self::new() } }
+    impl DebugTests for String {  }
+    #[test] fn test_debugtests_string() { <String as DebugTests>::test_all() }
 
-    #[trait_tests]
-    impl PartialOrdTests for String { fn new() -> Self { String::new() } }
+    impl PartialOrdTests for String {  }
+    #[test] fn test_partialordtests_string() { <String as PartialOrdTests>::test_all() }
 
-    #[trait_tests]
-    impl CopyTests for i32 { fn new() -> Self { 10 } }
+    impl CopyTests for i32 { }
+    #[test] fn test_copytests_string() { <i32 as CopyTests>::test_all() }
 
 }

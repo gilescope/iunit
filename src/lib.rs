@@ -11,9 +11,6 @@
 //!
 //! [ ] Each test is counted as a unique test. (Currently each set of trait tests counts as only 1 test).
 //!
-#![feature(custom_attribute)]
-#![feature(plugin)]
-
 #![feature(box_syntax)]
 #![feature(placement_in_syntax)]
 
@@ -22,7 +19,8 @@
 #![feature(alloc_system)] //alloc tests
 #![feature(allocator_api)]
 
-#![plugin(trait_tests)]
+#![feature(proc_macro)]
+#![macro_use] extern crate trait_tests;
 
 #[cfg(feature="eclectic_tests")]
 extern crate eclectic;
@@ -35,7 +33,7 @@ extern crate eclectic;
 //alloc tests
 extern crate alloc_system;
 
-#[macro_use] extern crate proptest;
+extern crate proptest;
 
 #[cfg(feature="num_tests")]
 extern crate num_traits;
